@@ -69,13 +69,35 @@
         </div>
 
         <div class="hero__media reveal">
-          <div class="hero__arch">
+          <span class="blob blob--one" aria-hidden="true"></span>
+          <span class="blob blob--two" aria-hidden="true"></span>
+
+          <figure class="hero__photo">
             <img src="assets/img/hero-modelo.jpg" alt="Modelo vestindo conjunto fitness rosa da BS Fitness">
+          </figure>
+
+          <div class="story story--hero">
+            <div class="story__bar"><span></span></div>
+            <div class="story__head">
+              <img src="assets/img/logo.png" alt="">
+              <p><strong>lojabsfitness</strong><small>Parnamirim, RN</small></p>
+            </div>
+            <video src="assets/video/reel-1.mp4" poster="assets/video/reel-1.jpg" muted loop playsinline autoplay preload="metadata"></video>
           </div>
-          <div class="hero__badge">
-            <span>Nova</span>
-            <strong>coleção</strong>
-          </div>
+
+          <a href="#colecao" class="hero__chip" data-goto="aurora-vinho">
+            <img src="assets/img/aurora-vinho.jpg" alt="">
+            <span>
+              <small>Look do vídeo</small>
+              <strong>Aurora Vinho &amp; Marinho</strong>
+              <em>R$ 134,90</em>
+            </span>
+            <i aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </i>
+          </a>
+
+          <div class="hearts" id="heroHearts" aria-hidden="true"></div>
         </div>
       </div>
     </section>
@@ -128,19 +150,24 @@
       <div class="container reels__inner">
         <div class="reels__text reveal">
           <p class="eyebrow">Provador</p>
-          <h2 class="section-title">Arrume-se <em>comigo</em></h2>
-          <p>Veja como as peças vestem de verdade: caimento, transparência zero e liberdade de movimento. Cada look é testado antes de chegar até você.</p>
+          <h2 class="section-title">Compre o <em>look do vídeo</em></h2>
+          <p>Veja como as peças vestem de verdade: caimento, zero transparência e liberdade de movimento. Escolha o tamanho e leve direto para a sacola.</p>
+          <div class="look" id="look"></div>
           <a href="https://www.tiktok.com/@lojabsfitness" target="_blank" rel="noopener" class="btn btn--line">Mais vídeos no TikTok</a>
         </div>
-        <div class="reels__videos">
-          <figure class="reel reveal">
-            <video src="assets/video/reel-1.mp4" poster="assets/video/reel-1.jpg" muted loop playsinline preload="none"></video>
-            <figcaption>Conjunto Aurora</figcaption>
-          </figure>
-          <figure class="reel reel--offset reveal">
+
+        <div class="reels__stage reveal">
+          <div class="story story--reel" id="reelStory">
+            <div class="story__bar"><span></span></div>
+            <div class="story__head">
+              <img src="assets/img/logo.png" alt="">
+              <p><strong>lojabsfitness</strong><small>Provador</small></p>
+            </div>
             <video src="assets/video/reel-2.mp4" poster="assets/video/reel-2.jpg" muted loop playsinline preload="none"></video>
-            <figcaption>Body &amp; cropped tela</figcaption>
-          </figure>
+            <button class="story__play" aria-label="Pausar ou reproduzir vídeo">
+              <svg viewBox="0 0 24 24"><path d="M9 7v10M15 7v10"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -256,7 +283,11 @@
 
   <aside class="drawer" id="drawer" aria-label="Sacola de compras" aria-hidden="true">
     <div class="drawer__head">
-      <h3>Sua sacola</h3>
+      <div class="drawer__title">
+        <span>sua</span>
+        <h3>Sacola</h3>
+        <small id="cartLabel">0 peças</small>
+      </div>
       <button class="icon-btn" id="cartClose" aria-label="Fechar sacola">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
@@ -298,6 +329,19 @@
       </form>
     </div>
   </aside>
+
+  <div class="added" id="added" role="status" aria-live="polite">
+    <img src="assets/img/logo.png" alt="" id="addedImg">
+    <div class="added__text">
+      <small>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg>
+        Adicionado à sacola
+      </small>
+      <strong id="addedName"></strong>
+      <span id="addedMeta"></span>
+    </div>
+    <button class="added__btn" id="addedView">Ver sacola</button>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
