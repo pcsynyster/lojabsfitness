@@ -627,7 +627,7 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.15 });
+}, { threshold: 0, rootMargin: "0px 0px -6% 0px" });
 $$(".reveal").forEach((el) => revealObserver.observe(el));
 
 const videoObserver = new IntersectionObserver((entries) => {
@@ -640,7 +640,8 @@ $$(".story video").forEach((v) => videoObserver.observe(v));
 $$(".story").forEach(setupStory);
 
 const hearts = $("#heroHearts");
-if (hearts && !reduceMotion) setInterval(() => !document.hidden && spawnHeart(hearts), 900);
+const isSmall = window.matchMedia("(max-width: 860px)").matches;
+if (hearts && !reduceMotion) setInterval(() => !document.hidden && spawnHeart(hearts), isSmall ? 1800 : 900);
 
 $("#year").textContent = new Date().getFullYear();
 
