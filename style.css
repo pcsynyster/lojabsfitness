@@ -1250,3 +1250,7 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
   .coupon__text p { font-size: .84rem; }
   .coupon__code { padding: 9px 12px; }
 }
+
+@media (min-width: 861px) {
+  .hero__cutout { right: 50%; transform: translateX(50%); }
+}
