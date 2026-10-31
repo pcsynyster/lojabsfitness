@@ -1507,3 +1507,41 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
   .ticket__body > p:last-child { font-size: .92rem; }
   .welcome__cta .btn { flex: 1 1 100%; }
 }
+
+/* Celular: foto ao lado do texto */
+@media (max-width: 860px) {
+  .welcome { padding-top: 18px; }
+  .welcome__inner {
+    grid-template-columns: 44% 1fr;
+    grid-template-areas:
+      "photo title"
+      "photo swash"
+      "photo lead"
+      "photo divider"
+      "pill pill"
+      "ticket ticket"
+      "cta cta";
+    column-gap: 10px;
+    row-gap: 0;
+    align-items: center;
+  }
+  .welcome__text { display: contents; }
+  .welcome__photo { grid-area: photo; align-self: end; }
+  .welcome__photo img { height: auto; width: 100%; max-height: 360px; object-fit: contain; object-position: bottom; }
+  .welcome__title { grid-area: title; justify-self: center; text-align: center; font-size: clamp(1.9rem, 8.4vw, 2.6rem); line-height: 1.05; padding-right: 0; margin-top: 10px; }
+  .welcome__heart { width: 24px; height: 24px; top: -14px; right: -6px; }
+  .welcome__swash { grid-area: swash; width: 70%; margin: 8px auto 12px; }
+  .welcome__lead { grid-area: lead; font-size: clamp(.98rem, 4.2vw, 1.15rem); text-align: center; }
+  .welcome__divider { grid-area: divider; margin: 14px 0 0; gap: 8px; }
+  .welcome__divider span { width: 40px; }
+  .welcome__pill { grid-area: pill; justify-self: center; margin-top: 22px; }
+  .ticket { grid-area: ticket; width: 100%; }
+  .welcome__cta { grid-area: cta; margin: 22px 0 44px; }
+}
+
+@media (max-width: 360px) {
+  .welcome__inner { grid-template-columns: 42% 1fr; }
+  .welcome__title { font-size: 1.75rem; }
+  .welcome__lead { font-size: .92rem; }
+}
+.welcome__title .nowrap { white-space: nowrap; }
