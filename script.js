@@ -120,6 +120,45 @@ async function fetchProducts() {
   return res.json();
 }
 
+const SITE_URL = "https://www.lojabsfitness.com.br/";
+const plain = (html) => new DOMParser().parseFromString(html, "text/html").documentElement.textContent;
+
+function injectProductSchema() {
+  $("#productSchema")?.remove();
+  if (!products.length) return;
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Produtos BS Fitness",
+    itemListElement: products.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Product",
+        name: plain(p.name),
+        description: plain(p.desc) || undefined,
+        image: p.variants.map((v) => new URL(v.img, SITE_URL).href),
+        brand: { "@type": "Brand", name: "BS Fitness" },
+        color: p.variants.map((v) => plain(v.color)).join(", "),
+        size: [...new Set(p.variants.flatMap((v) => v.sizes))].join(", "),
+        offers: {
+          "@type": "Offer",
+          price: p.price.toFixed(2),
+          priceCurrency: "BRL",
+          availability: "https://schema.org/InStock",
+          url: `${SITE_URL}#colecao`,
+          seller: { "@id": `${SITE_URL}#loja` }
+        }
+      }
+    }))
+  };
+  const tag = document.createElement("script");
+  tag.type = "application/ld+json";
+  tag.id = "productSchema";
+  tag.textContent = JSON.stringify(schema);
+  document.head.appendChild(tag);
+}
+
 function renderSkeleton() {
   els.products.innerHTML = '<div class="card-skeleton"></div>'.repeat(3);
 }
@@ -624,4 +663,5 @@ fetchProducts()
     renderProducts();
     renderCart();
     updateHeroChip();
+    injectProductSchema();
   });

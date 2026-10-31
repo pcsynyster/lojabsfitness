@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.lojabsfitness.com.br/</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/og-image.jpg</image:loc>
+      <image:title>BS Fitness - Moda fitness feminina em Parnamirim-RN</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/evolution-vermelho.jpg</image:loc>
+      <image:title>Conjunto Evolution vermelho</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/evolution-preto.jpg</image:loc>
+      <image:title>Conjunto Evolution preto</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/evolution-marrom.jpg</image:loc>
+      <image:title>Conjunto Evolution marrom</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/aurora-branco-lilas.jpg</image:loc>
+      <image:title>Conjunto Aurora branco e lilás</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/aurora-offwhite-verde.jpg</image:loc>
+      <image:title>Conjunto Aurora off-white e verde</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.lojabsfitness.com.br/assets/img/aurora2-marinho.jpg</image:loc>
+      <image:title>Conjunto Aurora 2.0 marinho com bolso</image:title>
+    </image:image>
+  </url>
+</urlset>
