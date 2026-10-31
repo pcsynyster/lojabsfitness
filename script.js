@@ -5,17 +5,20 @@ const SIZES = ["P", "M", "G", "GG"];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isSmall = window.matchMedia("(max-width: 860px)").matches;
 
-const products = [
+const SUPABASE_URL = "https://qhtmcmxyozqhwywrrteg.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFodG1jbXh5b3pxaHd5d3JydGVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjE0MDgsImV4cCI6MjEwODQ5NzQwOH0.4LQ14fH2YAFzGcE8sQ4O1qqY6s5BPgr1OykavyN9c6M";
+
+const FALLBACK = [
   {
     id: "evolution",
     name: "Conjunto Evolution",
     price: 136,
     tag: "Lançamento",
-    desc: "Top de alças finas com vivo branco e legging cintura alta com recortes. Firmeza e conforto para treinar com estilo.",
+    description: "Top de alças finas com vivo branco e legging cintura alta com recortes. Firmeza e conforto para treinar com estilo.",
     variants: [
-      { color: "Vermelho", swatch: "#a3172d", img: "assets/img/evolution-vermelho.jpg", sizes: ["M"] },
-      { color: "Preto", swatch: "#1c1b1e", img: "assets/img/evolution-preto.jpg", sizes: ["G"] },
-      { color: "Marrom", swatch: "#6f5245", img: "assets/img/evolution-marrom.jpg", sizes: ["G"] }
+      { color: "Vermelho", hex: "#a3172d", img: "assets/img/evolution-vermelho.jpg", sizes: ["M"] },
+      { color: "Preto", hex: "#1c1b1e", img: "assets/img/evolution-preto.jpg", sizes: ["G"] },
+      { color: "Marrom", hex: "#6f5245", img: "assets/img/evolution-marrom.jpg", sizes: ["G"] }
     ]
   },
   {
@@ -23,10 +26,10 @@ const products = [
     name: "Conjunto Aurora",
     price: 120.5,
     tag: "Mais vendido",
-    desc: "Top de alças largas e shorts soltinho com forro. Leve, fresquinho e essencial para corrida.",
+    description: "Top de alças largas e shorts soltinho com forro. Leve, fresquinho e essencial para corrida.",
     variants: [
-      { color: "Branco e lilás", swatch: "linear-gradient(135deg, #f4f2fb 50%, #b98be0 50%)", img: "assets/img/aurora-branco-lilas.jpg", sizes: ["P"] },
-      { color: "Off-white e verde", swatch: "linear-gradient(135deg, #f3eee2 50%, #7ee26a 50%)", img: "assets/img/aurora-offwhite-verde.jpg", sizes: ["GG"] }
+      { color: "Branco e lilás", hex: "#f4f2fb", hex2: "#b98be0", img: "assets/img/aurora-branco-lilas.jpg", sizes: ["P"] },
+      { color: "Off-white e verde", hex: "#f3eee2", hex2: "#7ee26a", img: "assets/img/aurora-offwhite-verde.jpg", sizes: ["GG"] }
     ]
   },
   {
@@ -34,12 +37,14 @@ const products = [
     name: "Conjunto Aurora 2.0",
     price: 129,
     tag: "Com bolso",
-    desc: "A nova versão do Aurora, agora com bolsos nas laterais. O mesmo caimento leve que você já ama.",
+    description: "A nova versão do Aurora, agora com bolsos nas laterais. O mesmo caimento leve que você já ama.",
     variants: [
-      { color: "Marinho", swatch: "#1f2747", img: "assets/img/aurora2-marinho.jpg", sizes: ["M"] }
+      { color: "Marinho", hex: "#1f2747", img: "assets/img/aurora2-marinho.jpg", sizes: ["M"] }
     ]
   }
 ];
+
+let products = [];
 
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
@@ -71,15 +76,69 @@ const els = {
   added: $("#added")
 };
 
-let cart = read(STORAGE_KEY, []).filter((i) => products.some((p) => p.id === i.id));
+let cart = read(STORAGE_KEY, []);
 let favs = read(FAV_KEY, []);
 let shownTotal = 0;
 const selection = {};
 
-products.forEach((p) => {
-  const v = p.variants[0];
-  selection[p.id] = { variant: 0, size: v.sizes.length === 1 ? v.sizes[0] : null };
-});
+const escapeHtml = (v = "") => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function normalize(list) {
+  return list
+    .map((p) => ({
+      id: String(p.id),
+      name: escapeHtml(p.name),
+      price: Number(p.price),
+      tag: p.tag ? escapeHtml(p.tag) : "",
+      desc: escapeHtml(p.description || ""),
+      variants: (p.variants || [])
+        .filter((v) => v.img && v.sizes?.length)
+        .map((v) => ({
+          color: escapeHtml(v.color),
+          swatch: v.hex2 ? `linear-gradient(135deg, ${v.hex} 50%, ${v.hex2} 50%)` : v.hex,
+          img: v.img,
+          sizes: v.sizes
+        }))
+    }))
+    .filter((p) => p.variants.length);
+}
+
+function setProducts(list) {
+  products = normalize(list);
+  products.forEach((p) => {
+    const v = p.variants[0];
+    selection[p.id] = { variant: 0, size: v.sizes.length === 1 ? v.sizes[0] : null };
+  });
+  cart = cart.filter((i) => products.some((p) => p.id === i.id));
+  saveCart();
+}
+
+async function fetchProducts() {
+  const url = `${SUPABASE_URL}/rest/v1/bs_products?select=id,name,price,tag,description,variants&active=eq.true&order=position.asc,created_at.asc`;
+  const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+function renderSkeleton() {
+  els.products.innerHTML = '<div class="card-skeleton"></div>'.repeat(3);
+}
+
+function renderEmpty() {
+  els.products.innerHTML = '<p class="products__empty">Novidades chegando em breve. Chama a gente no WhatsApp para saber o que já está disponível.</p>';
+}
+
+function updateHeroChip() {
+  const chip = $(".hero__chip");
+  if (!chip) return;
+  const p = products[0];
+  if (!p) return (chip.hidden = true);
+  chip.hidden = false;
+  chip.dataset.goto = p.id;
+  $("img", chip).src = p.variants[0].img;
+  $("strong", chip).innerHTML = p.name;
+  $("em", chip).textContent = money(p.price);
+}
 
 function read(key, fallback) {
   try {
@@ -141,6 +200,7 @@ function cardInner(p) {
 }
 
 function renderProducts() {
+  if (!products.length) return renderEmpty();
   els.products.innerHTML = products.map((p, i) =>
     `<article class="card" data-id="${p.id}" style="animation-delay:${i * 80}ms">${cardInner(p)}</article>`).join("");
 }
@@ -497,7 +557,8 @@ els.items.addEventListener("click", (e) => {
 
 $$("[data-goto]").forEach((link) => link.addEventListener("click", (e) => {
   e.preventDefault();
-  const card = $(`.card[data-id="${link.dataset.goto}"]`);
+  const card = $(`.card[data-id="${link.dataset.goto}"]`) || $(".card");
+  if (!card) return $("#colecao").scrollIntoView({ behavior: "smooth" });
   card.scrollIntoView({ behavior: "smooth", block: "center" });
   card.classList.add("is-highlight");
   setTimeout(() => card.classList.remove("is-highlight"), 2400);
@@ -553,5 +614,14 @@ if (hearts && !reduceMotion) setInterval(() => !document.hidden && spawnHeart(he
 
 $("#year").textContent = new Date().getFullYear();
 
-renderProducts();
+renderSkeleton();
 renderCart();
+
+fetchProducts()
+  .then((list) => setProducts(list))
+  .catch(() => setProducts(FALLBACK))
+  .finally(() => {
+    renderProducts();
+    renderCart();
+    updateHeroChip();
+  });
