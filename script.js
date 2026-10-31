@@ -1,104 +1,49 @@
 const WHATSAPP = "5584996327979";
-const STORAGE_KEY = "bsfitness-cart";
+const STORAGE_KEY = "bsfitness-cart-v2";
+const FAV_KEY = "bsfitness-favs";
 const SIZES = ["P", "M", "G", "GG"];
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isSmall = window.matchMedia("(max-width: 860px)").matches;
 
 const products = [
   {
-    id: "aurora-lilas",
-    name: "Conjunto Aurora Lilás",
-    category: "conjuntos",
-    price: 129.9,
-    tag: "Mais vendido",
-    desc: "Top de alças largas e shorts soltinho com forro. Leve, ideal para corrida.",
-    img: "assets/img/aurora-lilas.jpg"
-  },
-  {
-    id: "aurora-cores",
-    name: "Conjunto Aurora",
-    category: "conjuntos",
-    price: 129.9,
-    tag: "6 cores",
-    desc: "O queridinho da loja em várias cores. Escolha a sua favorita.",
-    img: "assets/img/aurora-cores.jpg",
-    colors: [
-      { name: "Laranja", hex: "#d9772f" },
-      { name: "Vinho", hex: "#8e2a32" },
-      { name: "Branco", hex: "#f4f1f2" },
-      { name: "Marinho", hex: "#1f2747" },
-      { name: "Preto", hex: "#1d1b1e" },
-      { name: "Lilás", hex: "#c9a8e3" }
+    id: "evolution",
+    name: "Conjunto Evolution",
+    price: 136,
+    tag: "Lançamento",
+    desc: "Top de alças finas com vivo branco e legging cintura alta com recortes. Firmeza e conforto para treinar com estilo.",
+    variants: [
+      { color: "Vermelho", swatch: "#a3172d", img: "assets/img/evolution-vermelho.jpg", sizes: ["M"] },
+      { color: "Preto", swatch: "#1c1b1e", img: "assets/img/evolution-preto.jpg", sizes: ["G"] },
+      { color: "Marrom", swatch: "#6f5245", img: "assets/img/evolution-marrom.jpg", sizes: ["G"] }
     ]
   },
   {
-    id: "aurora-vinho",
-    name: "Aurora Vinho & Marinho",
-    category: "conjuntos",
-    price: 134.9,
-    tag: "Novo",
-    desc: "Top vinho com shorts marinho. Combinação que valoriza e dá liberdade.",
-    img: "assets/img/aurora-vinho.jpg"
+    id: "aurora",
+    name: "Conjunto Aurora",
+    price: 120.5,
+    tag: "Mais vendido",
+    desc: "Top de alças largas e shorts soltinho com forro. Leve, fresquinho e essencial para corrida.",
+    variants: [
+      { color: "Branco e lilás", swatch: "linear-gradient(135deg, #f4f2fb 50%, #b98be0 50%)", img: "assets/img/aurora-branco-lilas.jpg", sizes: ["P"] },
+      { color: "Off-white e verde", swatch: "linear-gradient(135deg, #f3eee2 50%, #7ee26a 50%)", img: "assets/img/aurora-offwhite-verde.jpg", sizes: ["GG"] }
+    ]
   },
   {
-    id: "conjunto-nude",
-    name: "Conjunto Básico Nude",
-    category: "conjuntos",
-    price: 119.9,
-    tag: "Básico",
-    desc: "Cropped de alcinha e shorts cintura alta. Básico, elegante e confortável.",
-    img: "assets/img/conjunto-nude.jpg"
-  },
-  {
-    id: "conjunto-marinho",
-    name: "Conjunto Marinho Power",
-    category: "conjuntos",
-    price: 139.9,
-    desc: "Top com alças em contraste e shorts com cós anatômico. Desempenho e beleza.",
-    img: "assets/img/conjunto-marinho.jpg"
-  },
-  {
-    id: "conjunto-pink",
-    name: "Conjunto Pink NKFit",
-    category: "conjuntos",
-    price: 159.9,
-    tag: "Para as amantes de rosa",
-    desc: "Top nadador e shorts de compressão em tecido encorpado, zero transparência.",
-    img: "assets/img/conjunto-pink.jpg"
-  },
-  {
-    id: "macaquinho-marinho",
-    name: "Macaquinho Marinho",
-    category: "macaquinhos",
-    price: 149.9,
-    desc: "Peça única com zíper frontal, modela o corpo e acompanha todo o treino.",
-    img: "assets/img/macaquinho-marinho.jpg"
-  },
-  {
-    id: "body-marinho",
-    name: "Macaquinho Regata Marinho",
-    category: "macaquinhos",
-    price: 109.9,
-    tag: "1 peça, 3 looks",
-    desc: "Costas abertas e caimento colado: vai do treino ao jeans num instante.",
-    img: "assets/img/body-marinho.jpg"
-  },
-  {
-    id: "cropped-tela",
-    name: "Cropped Tela Preto",
-    category: "tops",
-    price: 59.9,
-    tag: "Novo",
-    desc: "Sobreposição em tela leve para dar um toque fashion ao look fitness.",
-    img: "assets/img/cropped-tela.jpg"
+    id: "aurora-2",
+    name: "Conjunto Aurora 2.0",
+    price: 129,
+    tag: "Com bolso",
+    desc: "A nova versão do Aurora, agora com bolsos nas laterais. O mesmo caimento leve que você já ama.",
+    variants: [
+      { color: "Marinho", swatch: "#1f2747", img: "assets/img/aurora2-marinho.jpg", sizes: ["M"] }
+    ]
   }
 ];
 
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const money = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-const FAV_KEY = "bsfitness-favs";
-const LOOK_IDS = ["body-marinho", "cropped-tela"];
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const ICONS = {
   heart: '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.2-7-9.5A4 4 0 0 1 12 8.3a4 4 0 0 1 7 2.2C19 15.8 12 20 12 20Z"/></svg>',
@@ -110,11 +55,7 @@ const ICONS = {
 
 const els = {
   header: $("#header"),
-  nav: $("#nav"),
-  menuBtn: $("#menuBtn"),
   products: $("#products"),
-  filters: $("#filters"),
-  look: $("#look"),
   drawer: $("#drawer"),
   overlay: $("#overlay"),
   items: $("#cartItems"),
@@ -130,10 +71,15 @@ const els = {
   added: $("#added")
 };
 
-let cart = read(STORAGE_KEY, []);
+let cart = read(STORAGE_KEY, []).filter((i) => products.some((p) => p.id === i.id));
 let favs = read(FAV_KEY, []);
 let shownTotal = 0;
 const selection = {};
+
+products.forEach((p) => {
+  const v = p.variants[0];
+  selection[p.id] = { variant: 0, size: v.sizes.length === 1 ? v.sizes[0] : null };
+});
 
 function read(key, fallback) {
   try {
@@ -151,115 +97,96 @@ function write(key, value) {
 
 const saveCart = () => write(STORAGE_KEY, cart);
 const productOf = (item) => products.find((p) => p.id === item.id);
-const sizeButtons = (id) => SIZES.map((s) =>
-  `<button class="size ${selection[id]?.size === s ? "is-active" : ""}" data-size="${s}">${s}</button>`).join("");
+const variantOf = (p) => p.variants[selection[p.id].variant];
 
-function renderProducts(filter = "todos") {
-  const list = filter === "todos" ? products : products.filter((p) => p.category === filter);
+function cardInner(p) {
+  const sel = selection[p.id];
+  const v = variantOf(p);
+  const fav = favs.includes(p.id);
 
-  els.products.innerHTML = list.map((p, i) => {
-    const sel = selection[p.id] || {};
-    const colors = p.colors
-      ? `<div class="colors">${p.colors.map((c) => `
-          <button class="color ${sel.color === c.name ? "is-active" : ""}" style="background:${c.hex}"
-            data-color="${c.name}" title="${c.name}" aria-label="Cor ${c.name}"></button>`).join("")}
-        </div>`
-      : "";
-    const fav = favs.includes(p.id);
+  const swatches = p.variants.map((x, i) => `
+    <button class="color ${i === sel.variant ? "is-active" : ""}" style="background:${x.swatch}"
+      data-variant="${i}" title="${x.color}" aria-label="Cor ${x.color}"></button>`).join("");
 
-    return `
-      <article class="card" data-id="${p.id}" style="animation-delay:${i * 60}ms">
-        <div class="card__media">
-          <img src="${p.img}" alt="${p.name}" loading="lazy">
-          ${p.tag ? `<span class="card__tag">${p.tag}</span>` : ""}
-          <button class="fav ${fav ? "is-on" : ""}" aria-label="Favoritar ${p.name}" aria-pressed="${fav}">${ICONS.heart}</button>
-        </div>
-        <div class="card__body">
-          <div class="card__top">
-            <h3 class="card__name">${p.name}</h3>
-            <div class="card__price">
-              <strong>${money(p.price)}</strong>
-              <small>3x de ${money(p.price / 3)}</small>
-            </div>
-          </div>
-          <p class="card__desc">${p.desc}</p>
-          <div class="card__opts">
-            <div class="sizes">${sizeButtons(p.id)}</div>
-            ${colors}
-          </div>
-          <button class="card__add">${ICONS.bag}<span>Adicionar à sacola</span></button>
-        </div>
-      </article>`;
+  const sizes = SIZES.map((s) => {
+    const ok = v.sizes.includes(s);
+    return `<button class="size ${sel.size === s ? "is-active" : ""} ${ok ? "" : "is-off"}" data-size="${s}" ${ok ? "" : "disabled"} aria-label="Tamanho ${s}${ok ? "" : " indisponível"}">${s}</button>`;
   }).join("");
-}
 
-function renderLook() {
-  els.look.innerHTML = LOOK_IDS.map((id) => {
-    const p = products.find((x) => x.id === id);
-    return `
-      <div class="look__item" data-id="${p.id}">
-        <img src="${p.img}" alt="${p.name}" loading="lazy">
-        <div>
-          <div class="look__top"><strong>${p.name}</strong><span>${money(p.price)}</span></div>
-          <div class="look__row">
-            <div class="sizes">${sizeButtons(p.id)}</div>
-            <button class="look__add">${ICONS.bag}<span>Adicionar</span></button>
-          </div>
+  return `
+    <div class="card__media">
+      <img src="${v.img}" alt="${p.name} ${v.color}" loading="lazy">
+      ${p.tag ? `<span class="card__tag">${p.tag}</span>` : ""}
+      <button class="fav ${fav ? "is-on" : ""}" aria-label="Favoritar ${p.name}" aria-pressed="${fav}">${ICONS.heart}</button>
+    </div>
+    <div class="card__body">
+      <div class="card__top">
+        <h3 class="card__name">${p.name}</h3>
+        <div class="card__price">
+          <strong>${money(p.price)}</strong>
+          <small>3x de ${money(p.price / 3)}</small>
         </div>
-      </div>`;
-  }).join("");
+      </div>
+      <p class="card__desc">${p.desc}</p>
+      <div class="card__color">
+        <span>Cor: <strong>${v.color}</strong></span>
+        <div class="colors">${swatches}</div>
+      </div>
+      <div class="card__opts">
+        <div class="sizes">${sizes}</div>
+        <span class="card__stock">Disponível: ${v.sizes.join(", ")}</span>
+      </div>
+      <button class="card__add">${ICONS.bag}<span>Adicionar à sacola</span></button>
+    </div>`;
 }
 
-function handleOptions(e, scope) {
-  const id = scope.dataset.id;
-  selection[id] = selection[id] || {};
-  const sizeBtn = e.target.closest(".size");
-  const colorBtn = e.target.closest(".color");
-
-  if (sizeBtn) {
-    selection[id].size = sizeBtn.dataset.size;
-    $$(`[data-id="${id}"] .size`).forEach((b) => b.classList.toggle("is-active", b.dataset.size === sizeBtn.dataset.size));
-    return true;
-  }
-  if (colorBtn) {
-    selection[id].color = colorBtn.dataset.color;
-    $$(".color", scope).forEach((b) => b.classList.toggle("is-active", b === colorBtn));
-    return true;
-  }
-  return false;
+function renderProducts() {
+  els.products.innerHTML = products.map((p, i) =>
+    `<article class="card" data-id="${p.id}" style="animation-delay:${i * 80}ms">${cardInner(p)}</article>`).join("");
 }
 
-function addToCart(id, scope, btn) {
-  const product = products.find((p) => p.id === id);
-  const sel = selection[id] || {};
+function selectVariant(card, index) {
+  const p = products.find((x) => x.id === card.dataset.id);
+  const v = p.variants[index];
+  selection[p.id] = { variant: index, size: v.sizes.length === 1 ? v.sizes[0] : null };
 
-  if (!sel.size || (product.colors && !sel.color)) {
-    showToast(!sel.size ? "Escolha um tamanho" : "Escolha uma cor");
-    scope.classList.remove("shake");
-    void scope.offsetWidth;
-    scope.classList.add("shake");
+  $(".card__media img", card).classList.add("is-swapping");
+  setTimeout(() => {
+    card.innerHTML = cardInner(p);
+    const fresh = $(".card__media img", card);
+    fresh.classList.add("is-swapping");
+    requestAnimationFrame(() => requestAnimationFrame(() => fresh.classList.remove("is-swapping")));
+  }, 180);
+}
+
+function addToCart(card, btn) {
+  const p = products.find((x) => x.id === card.dataset.id);
+  const sel = selection[p.id];
+  const v = variantOf(p);
+
+  if (!sel.size) {
+    showToast("Escolha um tamanho");
+    card.classList.remove("shake");
+    void card.offsetWidth;
+    card.classList.add("shake");
     return;
   }
 
-  const key = [id, sel.size, sel.color || ""].join("|");
+  const key = [p.id, v.color, sel.size].join("|");
   const existing = cart.find((i) => i.key === key);
   if (existing) existing.qty++;
-  else cart.push({ key, id, size: sel.size, color: sel.color || null, qty: 1 });
+  else cart.push({ key, id: p.id, color: v.color, img: v.img, size: sel.size, qty: 1 });
   saveCart();
 
   markAdded(btn);
-  flyToCart($("img", scope), () => {
+  flyToCart($(".card__media img", card), () => {
     renderCart();
     catchCart();
-    showAdded(product, sel);
+    showAdded(p, v, sel.size);
   });
 }
 
 function markAdded(btn) {
-  const label = $("span", btn);
-  const original = btn.dataset.label || label.textContent;
-  btn.dataset.label = original;
-
   const r = btn.getBoundingClientRect();
   const ripple = document.createElement("span");
   const size = Math.max(r.width, r.height);
@@ -273,7 +200,7 @@ function markAdded(btn) {
   clearTimeout(btn._timer);
   btn._timer = setTimeout(() => {
     btn.classList.remove("is-added");
-    btn.innerHTML = `${ICONS.bag}<span>${original}</span>`;
+    btn.innerHTML = `${ICONS.bag}<span>Adicionar à sacola</span>`;
   }, 1800);
 }
 
@@ -281,7 +208,7 @@ function flyToCart(img, done) {
   if (!img || reduceMotion) return done();
 
   const from = img.getBoundingClientRect();
-  const to = els.cartBtn.getBoundingClientRect();
+  const to = $(".tab__icon", els.cartBtn).getBoundingClientRect();
   const size = Math.min(110, from.width);
   const startX = from.left + from.width / 2 - size / 2;
   const startY = from.top + from.height / 2 - size / 2;
@@ -312,14 +239,14 @@ function catchCart() {
   void els.cartBtn.offsetWidth;
   els.cartBtn.classList.add("is-catch");
   els.count.classList.add("bump");
-  if (!reduceMotion) burstHearts(els.cartBtn);
+  if (!reduceMotion) burstHearts($(".tab__icon", els.cartBtn), 9, true);
 }
 
-function burstHearts(target, amount = 9) {
+function burstHearts(target, amount = 9, light = false) {
   const r = target.getBoundingClientRect();
   const cx = r.left + r.width / 2;
   const cy = r.top + r.height / 2;
-  const tones = ["#d94f9c", "#ec7dbb", "#b3307c", "#f7a8d0"];
+  const tones = light ? ["#ffffff", "#fbd3e9", "#f7a8d0", "#ffe3f1"] : ["#d94f9c", "#ec7dbb", "#b3307c", "#f7a8d0"];
 
   for (let i = 0; i < amount; i++) {
     const heart = document.createElement("span");
@@ -345,10 +272,10 @@ function burstHearts(target, amount = 9) {
 }
 
 let addedTimer;
-function showAdded(product, sel) {
-  $("#addedImg").src = product.img;
-  $("#addedName").textContent = product.name;
-  $("#addedMeta").textContent = `Tam. ${sel.size}${sel.color ? ` · ${sel.color}` : ""} · ${money(product.price)}`;
+function showAdded(p, v, size) {
+  $("#addedImg").src = v.img;
+  $("#addedName").textContent = p.name;
+  $("#addedMeta").textContent = `${v.color} · Tam. ${size} · ${money(p.price)}`;
   els.added.classList.add("is-show");
   clearTimeout(addedTimer);
   addedTimer = setTimeout(() => els.added.classList.remove("is-show"), 3200);
@@ -386,7 +313,7 @@ function renderCart() {
         ${ICONS.heart}
         <h4>Sua sacola está vazia</h4>
         <p>Que tal escolher seu próximo look?</p>
-        <a href="#colecao" class="btn btn--line" data-close>Ver coleção</a>
+        <a href="#colecao" class="btn btn--line" data-close>Ver produtos</a>
       </div>`;
     return;
   }
@@ -395,10 +322,10 @@ function renderCart() {
     const p = productOf(i);
     return `
       <div class="item" data-key="${i.key}">
-        <img src="${p.img}" alt="${p.name}">
+        <img src="${i.img}" alt="${p.name}">
         <div>
           <p class="item__name">${p.name}</p>
-          <p class="item__meta">Tam. ${i.size}${i.color ? ` · ${i.color}` : ""}</p>
+          <p class="item__meta">${i.color} · Tam. ${i.size}</p>
           <div class="qty">
             <button data-qty="-1" aria-label="Diminuir">&minus;</button>
             <span>${i.qty}</span>
@@ -456,8 +383,7 @@ function checkout(e) {
 
   const lines = cart.map((i) => {
     const p = productOf(i);
-    const color = i.color ? ` - ${i.color}` : "";
-    return `- ${i.qty}x ${p.name} (Tam. ${i.size}${color}) - ${money(p.price * i.qty)}`;
+    return `- ${i.qty}x ${p.name} (${i.color}, Tam. ${i.size}) - ${money(p.price * i.qty)}`;
   });
   const total = cart.reduce((s, i) => s + productOf(i).price * i.qty, 0);
 
@@ -490,13 +416,6 @@ function closeCart() {
   els.overlay.classList.remove("is-open");
   els.drawer.setAttribute("aria-hidden", "true");
   document.body.classList.remove("lock");
-}
-
-function toggleMenu(force) {
-  const open = force ?? !els.nav.classList.contains("is-open");
-  els.nav.classList.toggle("is-open", open);
-  els.menuBtn.classList.toggle("is-open", open);
-  els.menuBtn.setAttribute("aria-expanded", open);
 }
 
 let toastTimer;
@@ -546,25 +465,25 @@ function spawnHeart(container) {
 
 els.products.addEventListener("click", (e) => {
   const card = e.target.closest(".card");
-  if (!card || handleOptions(e, card)) return;
+  if (!card) return;
+  const id = card.dataset.id;
+
+  const colorBtn = e.target.closest(".color");
+  if (colorBtn) return selectVariant(card, Number(colorBtn.dataset.variant));
+
+  const sizeBtn = e.target.closest(".size");
+  if (sizeBtn) {
+    if (sizeBtn.disabled) return;
+    selection[id].size = sizeBtn.dataset.size;
+    $$(".size", card).forEach((b) => b.classList.toggle("is-active", b === sizeBtn));
+    return;
+  }
+
   const favBtn = e.target.closest(".fav");
-  if (favBtn) return toggleFav(favBtn, card.dataset.id);
+  if (favBtn) return toggleFav(favBtn, id);
+
   const addBtn = e.target.closest(".card__add");
-  if (addBtn) addToCart(card.dataset.id, card, addBtn);
-});
-
-els.look.addEventListener("click", (e) => {
-  const item = e.target.closest(".look__item");
-  if (!item || handleOptions(e, item)) return;
-  const addBtn = e.target.closest(".look__add");
-  if (addBtn) addToCart(item.dataset.id, item, addBtn);
-});
-
-els.filters.addEventListener("click", (e) => {
-  const chip = e.target.closest(".chip");
-  if (!chip) return;
-  $$(".chip", els.filters).forEach((c) => c.classList.toggle("is-active", c === chip));
-  renderProducts(chip.dataset.filter);
+  if (addBtn) addToCart(card, addBtn);
 });
 
 els.items.addEventListener("click", (e) => {
@@ -578,13 +497,7 @@ els.items.addEventListener("click", (e) => {
 
 $$("[data-goto]").forEach((link) => link.addEventListener("click", (e) => {
   e.preventDefault();
-  const id = link.dataset.goto;
-  let card = $(`.card[data-id="${id}"]`);
-  if (!card) {
-    $$(".chip", els.filters).forEach((c) => c.classList.toggle("is-active", c.dataset.filter === "todos"));
-    renderProducts();
-    card = $(`.card[data-id="${id}"]`);
-  }
+  const card = $(`.card[data-id="${link.dataset.goto}"]`);
   card.scrollIntoView({ behavior: "smooth", block: "center" });
   card.classList.add("is-highlight");
   setTimeout(() => card.classList.remove("is-highlight"), 2400);
@@ -603,18 +516,14 @@ $("#cartClear").addEventListener("click", () => {
   renderCart();
 });
 
-els.menuBtn.addEventListener("click", () => toggleMenu());
-$$("a", els.nav).forEach((a) => a.addEventListener("click", () => toggleMenu(false)));
-
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeCart();
-    toggleMenu(false);
-  }
+  if (e.key === "Escape") closeCart();
 });
 
 window.addEventListener("scroll", () => {
-  els.header.classList.toggle("is-scrolled", window.scrollY > 10);
+  const y = window.scrollY;
+  if (y > 160) els.header.classList.add("is-compact");
+  else if (y < 40) els.header.classList.remove("is-compact");
 }, { passive: true });
 
 const track = $(".topbar__track");
@@ -640,11 +549,9 @@ $$(".story video").forEach((v) => videoObserver.observe(v));
 $$(".story").forEach(setupStory);
 
 const hearts = $("#heroHearts");
-const isSmall = window.matchMedia("(max-width: 860px)").matches;
 if (hearts && !reduceMotion) setInterval(() => !document.hidden && spawnHeart(hearts), isSmall ? 1800 : 900);
 
 $("#year").textContent = new Date().getFullYear();
 
 renderProducts();
-renderLook();
 renderCart();

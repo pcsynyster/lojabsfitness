@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BS Fitness | Moda Fitness em Parnamirim-RN</title>
-  <meta name="description" content="BS Fitness - moda fitness feminina em Parnamirim-RN. Conjuntos, macaquinhos e tops com conforto e estilo. Enviamos para todo o Brasil.">
-  <meta name="theme-color" content="#d94f9c">
-  <link rel="icon" href="assets/img/logo.png">
+  <meta name="description" content="BS Fitness - moda fitness feminina em Parnamirim-RN. Conjuntos fitness com conforto e estilo. Enviamos para todo o Brasil.">
+  <meta name="theme-color" content="#db61ac">
+  <link rel="icon" href="assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -24,30 +24,36 @@
   </div>
 
   <header class="header" id="header">
-    <div class="container header__inner">
-      <a href="#inicio" class="brand" aria-label="BS Fitness - início">
-        <img src="assets/img/logo.png" alt="" class="brand__logo">
-        <span class="brand__name">BS Fitness<small>moda fitness</small></span>
+    <div class="header__brand">
+      <a href="#inicio" class="brand" aria-label="BS Fitness Moda fitness - início">
+        <img src="assets/img/logo-branca.png" alt="BS Fitness Moda fitness" class="brand__logo">
       </a>
-
-      <nav class="nav" id="nav" aria-label="Menu principal">
-        <a href="#colecao">Coleção</a>
-        <a href="#reels">Provador</a>
-        <a href="#tamanhos">Tamanhos</a>
-        <a href="#comunidade">Comunidade</a>
-        <a href="#contato">Contato</a>
-      </nav>
-
-      <div class="header__actions">
-        <button class="cart-btn" id="cartOpen" aria-label="Abrir sacola">
+    </div>
+    <nav class="tabs" aria-label="Menu principal">
+      <a href="#inicio" class="tab">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8Z"/></svg>
+        <span>Início</span>
+      </a>
+      <a href="#colecao" class="tab">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>
+        <span>Produtos</span>
+      </a>
+      <a href="#reels" class="tab">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="3"/><path d="m10.5 9.5 4 2.5-4 2.5v-5Z"/></svg>
+        <span>Provador</span>
+      </a>
+      <a href="#tamanhos" class="tab">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16 16 3l5 5L8 21l-5-5ZM7 12l2 2M10 9l2 2M13 6l2 2"/></svg>
+        <span>Tamanhos</span>
+      </a>
+      <button class="tab cart-btn" id="cartOpen" aria-label="Abrir sacola">
+        <span class="tab__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
           <span class="cart-btn__count" id="cartCount">0</span>
-        </button>
-        <button class="menu-btn" id="menuBtn" aria-label="Abrir menu" aria-expanded="false">
-          <span></span><span></span>
-        </button>
-      </div>
-    </div>
+        </span>
+        <span>Sacola</span>
+      </button>
+    </nav>
   </header>
 
   <main>
@@ -85,12 +91,12 @@
             <video src="assets/video/reel-1.mp4" poster="assets/video/reel-1.jpg" muted loop playsinline autoplay preload="metadata"></video>
           </div>
 
-          <a href="#colecao" class="hero__chip" data-goto="aurora-vinho">
-            <img src="assets/img/aurora-vinho.jpg" alt="">
+          <a href="#colecao" class="hero__chip" data-goto="aurora">
+            <img src="assets/img/aurora-branco-lilas.jpg" alt="">
             <span>
               <small>Look do vídeo</small>
-              <strong>Aurora Vinho &amp; Marinho</strong>
-              <em>R$ 134,90</em>
+              <strong>Conjunto Aurora</strong>
+              <em>R$ 120,50</em>
             </span>
             <i aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -135,13 +141,6 @@
           <p class="section-sub">Selecione o tamanho, adicione à sacola e finalize o pedido direto no nosso WhatsApp.</p>
         </div>
 
-        <div class="filters reveal" id="filters" role="tablist">
-          <button class="chip is-active" data-filter="todos">Todos</button>
-          <button class="chip" data-filter="conjuntos">Conjuntos</button>
-          <button class="chip" data-filter="macaquinhos">Macaquinhos</button>
-          <button class="chip" data-filter="tops">Tops &amp; body</button>
-        </div>
-
         <div class="products" id="products"></div>
       </div>
     </section>
@@ -150,9 +149,8 @@
       <div class="container reels__inner">
         <div class="reels__text reveal">
           <p class="eyebrow">Provador</p>
-          <h2 class="section-title">Compre o <em>look do vídeo</em></h2>
-          <p>Veja como as peças vestem de verdade: caimento, zero transparência e liberdade de movimento. Escolha o tamanho e leve direto para a sacola.</p>
-          <div class="look" id="look"></div>
+          <h2 class="section-title">Veja o caimento <em>de perto</em></h2>
+          <p>Veja como as peças vestem de verdade: caimento, zero transparência e liberdade de movimento. Cada look é testado antes de chegar até você.</p>
           <a href="https://www.tiktok.com/@lojabsfitness" target="_blank" rel="noopener" class="btn btn--line">Mais vídeos no TikTok</a>
         </div>
 
@@ -345,6 +343,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
