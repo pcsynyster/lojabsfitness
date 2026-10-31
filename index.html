@@ -84,7 +84,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
 
@@ -131,54 +131,51 @@
   </header>
 
   <main>
-    <section class="hero" id="inicio">
-      <div class="container hero__inner">
-        <div class="hero__text reveal">
-          <p class="eyebrow">Moda fitness &middot; Parnamirim/RN</p>
-          <h1 class="hero__title">Seja <em>bem-vinda!</em></h1>
-          <p class="hero__lead">A disciplina constrói resultados, o look certo aumenta sua confiança.</p>
-          <div class="hero__cta">
-            <a href="#colecao" class="btn btn--solid">Ver coleção</a>
-            <a href="https://wa.me/5584996327979?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20BS%20Fitness!" target="_blank" rel="noopener" class="btn btn--line">Atendimento personalizado</a>
+    <section class="welcome" id="inicio">
+      <span class="welcome__curve" aria-hidden="true"></span>
+      <div class="container welcome__inner">
+        <figure class="welcome__photo reveal">
+          <img src="assets/img/hero-recorte.webp" alt="Cliente vestindo conjunto fitness com bolso da BS Fitness" width="559" height="1100" fetchpriority="high">
+        </figure>
+
+        <div class="welcome__text reveal">
+          <h1 class="welcome__title">
+            Seja bem-vinda!
+            <svg class="welcome__heart" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40S8 30.5 8 19a8.5 8.5 0 0 1 16-4 8.5 8.5 0 0 1 16 4c0 11.5-16 21-16 21Z"/></svg>
+          </h1>
+          <span class="welcome__swash" aria-hidden="true"></span>
+
+          <p class="welcome__lead">A disciplina constrói <strong>resultados</strong>, o look certo aumenta sua <strong>confiança</strong>.</p>
+
+          <div class="welcome__divider" aria-hidden="true">
+            <span></span>
+            <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.2-7-9.5A4 4 0 0 1 12 8.3a4 4 0 0 1 7 2.2C19 15.8 12 20 12 20Z"/></svg>
+            <span></span>
           </div>
-          <div class="coupon">
-            <div class="coupon__text">
-              <strong>Nova por aqui?</strong>
-              <p>Use o cupom <b>BS10</b> e garanta 10% de desconto em sua primeira compra.</p>
+
+          <p class="welcome__pill">Nova por aqui?</p>
+
+          <div class="ticket">
+            <svg class="ticket__icon" viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M8 14h32v6a4 4 0 0 0 0 8v6H8v-6a4 4 0 0 0 0-8v-6Z" transform="rotate(-14 24 24)"/>
+              <path d="M19 30 29 18" transform="rotate(-14 24 24)"/>
+              <circle cx="19.5" cy="19.5" r="1.6" transform="rotate(-14 24 24)"/>
+              <circle cx="28.5" cy="28.5" r="1.6" transform="rotate(-14 24 24)"/>
+            </svg>
+            <div class="ticket__body">
+              <p>Use o cupom</p>
+              <button type="button" class="ticket__code" id="couponCopy" data-code="BS10" aria-label="Copiar cupom BS10">
+                <span>BS10</span>
+                <small>Copiar</small>
+              </button>
+              <p>e garanta <strong>10% de desconto</strong><br>em sua primeira compra.</p>
             </div>
-            <button type="button" class="coupon__code" id="couponCopy" data-code="BS10" aria-label="Copiar cupom BS10">
-              <span>BS10</span>
-              <small>Copiar</small>
-            </button>
           </div>
-          <ul class="hero__facts">
-            <li><strong>P ao GG</strong><span>grade completa</span></li>
-            <li><strong>Brasil</strong><span>envio nacional</span></li>
-            <li><strong>3x</strong><span>sem juros no cartão</span></li>
-          </ul>
-        </div>
 
-        <div class="hero__media reveal">
-          <span class="blob blob--one" aria-hidden="true"></span>
-          <span class="blob blob--two" aria-hidden="true"></span>
-
-          <figure class="hero__cutout">
-            <img src="assets/img/hero-recorte.webp" alt="Cliente vestindo conjunto fitness com bolso da BS Fitness" width="559" height="1100" fetchpriority="high">
-          </figure>
-
-          <a href="#colecao" class="hero__chip" data-goto="aurora">
-            <img src="assets/img/aurora-branco-lilas.jpg" alt="">
-            <span>
-              <small>Destaque</small>
-              <strong>Conjunto Aurora</strong>
-              <em>R$ 120,50</em>
-            </span>
-            <i aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </i>
-          </a>
-
-          <div class="hearts" id="heroHearts" aria-hidden="true"></div>
+          <div class="welcome__cta">
+            <a href="#colecao" class="btn btn--solid">Ver coleção</a>
+            <a href="https://wa.me/5584996327979?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20BS%20Fitness!" target="_blank" rel="noopener" class="btn btn--line">Atendimento</a>
+          </div>
         </div>
       </div>
     </section>
