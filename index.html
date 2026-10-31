@@ -84,7 +84,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
 
@@ -405,10 +405,46 @@
             </select>
           </label>
         </div>
+        <fieldset class="address" id="addressBox">
+          <legend>Endereço de entrega</legend>
+          <div class="address__row">
+            <label class="address__cep">
+              <span>CEP</span>
+              <input type="text" id="aCep" inputmode="numeric" autocomplete="postal-code" placeholder="59000-000" maxlength="9">
+            </label>
+            <label>
+              <span>Cidade</span>
+              <input type="text" id="aCity" autocomplete="address-level2" placeholder="Parnamirim">
+            </label>
+          </div>
+          <label>
+            <span>Rua</span>
+            <input type="text" id="aStreet" autocomplete="address-line1" placeholder="Rua, avenida...">
+          </label>
+          <div class="address__row">
+            <label class="address__num">
+              <span>Número</span>
+              <input type="text" id="aNumber" placeholder="123">
+            </label>
+            <label>
+              <span>Bairro</span>
+              <input type="text" id="aDistrict" placeholder="Bairro">
+            </label>
+          </div>
+          <label>
+            <span>Complemento ou referência (opcional)</span>
+            <input type="text" id="aRef" autocomplete="address-line2" placeholder="Apto, bloco, ponto de referência">
+          </label>
+          <p class="address__msg" id="aMsg" aria-live="polite"></p>
+        </fieldset>
+        <div class="freeship" id="freeship">
+          <p id="freeshipText">Compras a partir de <strong>R$ 350,00</strong> têm frete grátis.</p>
+          <div class="freeship__bar"><span id="freeshipBar"></span></div>
+        </div>
         <div class="totals">
           <div><span>Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
           <div class="totals__discount" id="discountRow" hidden><span id="discountLabel">Cupom</span><span id="cartDiscount">- R$ 0,00</span></div>
-          <div class="totals__muted"><span>Frete</span><span>a combinar</span></div>
+          <div class="totals__muted" id="shipRow"><span>Frete</span><span id="cartShip">a combinar</span></div>
           <div class="totals__total"><span>Total</span><span id="cartTotal">R$ 0,00</span></div>
         </div>
         <button type="submit" class="btn btn--solid btn--block">Finalizar pelo WhatsApp</button>
@@ -439,6 +475,6 @@
     </span>
   </a>
 
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

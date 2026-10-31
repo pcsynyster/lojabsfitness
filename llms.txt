@@ -20,6 +20,7 @@
 
 - Pagamento: Pix, cartão (crédito e débito) e dinheiro
 - Entrega: em Parnamirim e Natal, retirada combinada ou envio pelos Correios para todo o Brasil
+- Frete grátis em compras a partir de R$ 350,00 (exceto retirada, que não tem custo); abaixo disso, a loja calcula o frete pelo endereço informado
 
 ## Tabela de tamanhos
 

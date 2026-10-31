@@ -1299,3 +1299,35 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
 .drawer__body { flex: 0 0 auto; overflow: visible; }
 .drawer__foot { max-height: none; overflow: visible; margin-top: auto; }
 .checkout__hint { font-size: .72rem; color: var(--muted); margin-top: -2px; }
+
+/* Endereço e frete grátis */
+.address { border: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px; border-radius: 16px; background: var(--blush); }
+.address[hidden] { display: none; }
+.address legend { float: left; width: 100%; font-family: var(--serif); font-size: 1.15rem; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.address label { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+.address label span { font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.address input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .3s;
+}
+.address input:focus { border-color: var(--pink); }
+.address input.is-invalid { border-color: #d0405f; }
+.address__row { display: flex; gap: 10px; }
+.address__cep { flex: 0 0 38% !important; }
+.address__num { flex: 0 0 30% !important; }
+.address__msg { font-size: .76rem; color: var(--muted); }
+.address__msg:empty { display: none; }
+
+.freeship { padding: 12px 14px; border-radius: 14px; border: 1px dashed var(--pink-light); font-size: .84rem; color: var(--muted); }
+.freeship strong { color: var(--pink-deep); font-weight: 500; }
+.freeship__bar { height: 5px; margin-top: 8px; border-radius: 5px; background: var(--pink-soft); overflow: hidden; }
+.freeship__bar span { display: block; height: 100%; width: 0; border-radius: 5px; background: linear-gradient(90deg, var(--pink-light), var(--pink)); transition: width .6s var(--ease); }
+.freeship.is-free { border-style: solid; border-color: #9fd8b5; background: #f1faf4; color: #2f8f5b; }
+.freeship.is-free .freeship__bar span { background: #3aa86b; }
+.totals__ship-free { color: #2f8f5b !important; }

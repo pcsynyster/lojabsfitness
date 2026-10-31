@@ -2,6 +2,9 @@ const WHATSAPP = "5584996327979";
 const STORAGE_KEY = "bsfitness-cart-v2";
 const FAV_KEY = "bsfitness-favs";
 const SIZES = ["P", "M", "G", "GG"];
+const FREE_SHIPPING_MIN = 350;
+const PICKUP = "Retirada combinada";
+const CHECKOUT_KEY = "bsfitness-checkout";
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isSmall = window.matchMedia("(max-width: 860px)").matches;
 
@@ -79,6 +82,19 @@ const els = {
   discountRow: $("#discountRow"),
   discountLabel: $("#discountLabel"),
   discount: $("#cartDiscount"),
+  delivery: $("#cDelivery"),
+  addressBox: $("#addressBox"),
+  cep: $("#aCep"),
+  city: $("#aCity"),
+  street: $("#aStreet"),
+  number: $("#aNumber"),
+  district: $("#aDistrict"),
+  ref: $("#aRef"),
+  addressMsg: $("#aMsg"),
+  freeship: $("#freeship"),
+  freeshipText: $("#freeshipText"),
+  freeshipBar: $("#freeshipBar"),
+  ship: $("#cartShip"),
   toast: $("#toast"),
   added: $("#added")
 };
@@ -426,6 +442,100 @@ function updateTotals() {
     els.discount.textContent = `- ${money(discount)}`;
   }
   animateTotal(subtotal - discount);
+  updateShipping(subtotal - discount);
+}
+
+const isPickup = () => els.delivery?.value === PICKUP;
+const hasFreeShipping = (total) => !isPickup() && total >= FREE_SHIPPING_MIN;
+
+function updateShipping(total = cartSubtotal() - cartDiscount(cartSubtotal())) {
+  if (els.addressBox) els.addressBox.hidden = isPickup();
+  if (els.ship) {
+    els.ship.textContent = isPickup() ? "sem custo" : hasFreeShipping(total) ? "Grátis" : "a calcular pela loja";
+    els.ship.classList.toggle("totals__ship-free", isPickup() || hasFreeShipping(total));
+  }
+  if (!els.freeship) return;
+  els.freeship.hidden = isPickup();
+  const free = hasFreeShipping(total);
+  els.freeship.classList.toggle("is-free", free);
+  els.freeshipBar.style.width = `${Math.min(100, (total / FREE_SHIPPING_MIN) * 100)}%`;
+  els.freeshipText.innerHTML = free
+    ? "Parabéns! Sua compra ganhou <strong>frete grátis</strong>."
+    : total > 0
+      ? `Faltam <strong>${money(FREE_SHIPPING_MIN - total)}</strong> para ganhar frete grátis (compras a partir de ${money(FREE_SHIPPING_MIN)}).`
+      : `Compras a partir de <strong>${money(FREE_SHIPPING_MIN)}</strong> têm frete grátis.`;
+}
+
+const addressFields = () => ["cep", "city", "street", "number", "district", "ref"].filter((k) => els[k]);
+
+function saveCheckoutInfo() {
+  const info = { name: els.name.value, phone: els.phone?.value || "" };
+  addressFields().forEach((k) => (info[k] = els[k].value));
+  write(CHECKOUT_KEY, info);
+}
+
+function restoreCheckoutInfo() {
+  const info = read(CHECKOUT_KEY, null);
+  if (!info) return;
+  if (info.name && !els.name.value) els.name.value = info.name;
+  if (info.phone && els.phone && !els.phone.value) els.phone.value = info.phone;
+  addressFields().forEach((k) => {
+    if (info[k] && !els[k].value) els[k].value = info[k];
+  });
+}
+
+function formatCep(v) {
+  const d = v.replace(/\D/g, "").slice(0, 8);
+  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+}
+
+let lastCep = "";
+async function lookupCep() {
+  const cep = els.cep.value.replace(/\D/g, "");
+  if (cep.length !== 8 || cep === lastCep) return;
+  lastCep = cep;
+  els.addressMsg.textContent = "Buscando endereço...";
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`, { signal: ctrl.signal });
+    const data = await res.json();
+    if (data.erro) throw new Error("cep");
+    els.street.value = data.logradouro || els.street.value;
+    els.district.value = data.bairro || els.district.value;
+    els.city.value = data.localidade ? `${data.localidade} - ${data.uf}` : els.city.value;
+    els.addressMsg.textContent = "";
+    [els.street, els.district, els.city].forEach((el) => el.classList.remove("is-invalid"));
+    (els.street.value ? els.number : els.street).focus();
+    saveCheckoutInfo();
+  } catch {
+    els.addressMsg.textContent = "Não encontramos esse CEP. Preencha o endereço manualmente.";
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function validateAddress() {
+  if (!els.addressBox || isPickup()) return true;
+  const required = [els.street, els.number, els.district, els.city];
+  if (els.delivery.value === "Envio pelos Correios") required.unshift(els.cep);
+  const missing = required.filter((el) => el && !(el === els.cep ? el.value.replace(/\D/g, "").length === 8 : el.value.trim()));
+  required.forEach((el) => el?.classList.toggle("is-invalid", missing.includes(el)));
+  if (missing.length) {
+    missing[0].focus();
+    showToast("Preencha o endereço de entrega");
+    return false;
+  }
+  return true;
+}
+
+function addressText() {
+  if (!els.addressBox || isPickup()) return null;
+  const v = (el) => el?.value.trim() || "";
+  const parts = [`${v(els.street)}, ${v(els.number)}`, v(els.district), v(els.city)].filter(Boolean).join(" - ");
+  const cep = v(els.cep) ? ` - CEP ${v(els.cep)}` : "";
+  const ref = v(els.ref) ? `\nReferência: ${v(els.ref)}` : "";
+  return `Endereço: ${parts}${cep}${ref}`;
 }
 
 function renderCart() {
@@ -571,6 +681,12 @@ function buildMessage(name, phone) {
   });
   const subtotal = cartSubtotal();
   const discount = cartDiscount(subtotal);
+  const total = subtotal - discount;
+  const shipping = isPickup()
+    ? null
+    : hasFreeShipping(total)
+      ? `Frete: GRÁTIS (compra acima de ${money(FREE_SHIPPING_MIN)})`
+      : "Frete: a calcular pela loja";
 
   return [
     `Olá, BS Fitness! Meu nome é ${name} e quero fazer um pedido pelo site:`,
@@ -580,11 +696,14 @@ function buildMessage(name, phone) {
     "",
     `Subtotal: ${money(subtotal)}`,
     appliedCoupon ? `Cupom ${appliedCoupon.code} (-${appliedCoupon.percent}%): - ${money(discount)}` : null,
-    `Total dos produtos: ${money(subtotal - discount)}`,
-    `Entrega: ${$("#cDelivery").value}`,
+    `Total dos produtos: ${money(total)}`,
+    "",
+    `Entrega: ${els.delivery?.value || ""}`,
+    addressText(),
+    shipping,
     `Pagamento: ${$("#cPay").value}`,
     "",
-    "Aguardo a confirmação e o valor do frete."
+    shipping && !hasFreeShipping(total) ? "Aguardo a confirmação e o valor do frete." : "Aguardo a confirmação."
   ].filter((l) => l !== null).join("\n");
 }
 
@@ -604,6 +723,9 @@ async function checkout(e) {
     showToast("Informe seu nome para finalizar");
     return;
   }
+
+  if (!validateAddress()) return;
+  saveCheckoutInfo();
 
   if (els.coupon?.value.trim() && !appliedCoupon) {
     showToast("Toque em Aplicar para validar o cupom");
@@ -742,6 +864,17 @@ $("#cartClose").addEventListener("click", closeCart);
 els.overlay.addEventListener("click", closeCart);
 els.form.addEventListener("submit", checkout);
 els.name.addEventListener("input", () => els.name.classList.remove("is-invalid"));
+els.delivery?.addEventListener("change", () => updateShipping());
+els.cep?.addEventListener("input", () => {
+  els.cep.value = formatCep(els.cep.value);
+  els.cep.classList.remove("is-invalid");
+  lookupCep();
+});
+addressFields().forEach((k) => els[k].addEventListener("input", () => els[k].classList.remove("is-invalid")));
+addressFields().forEach((k) => els[k].addEventListener("change", saveCheckoutInfo));
+els.name.addEventListener("change", saveCheckoutInfo);
+els.phone?.addEventListener("change", saveCheckoutInfo);
+restoreCheckoutInfo();
 els.couponBtn?.addEventListener("click", applyCoupon);
 els.coupon?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
