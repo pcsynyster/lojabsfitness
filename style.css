@@ -1545,3 +1545,111 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
   .welcome__lead { font-size: .92rem; }
 }
 .welcome__title .nowrap { white-space: nowrap; }
+
+/* Efeitos na foto do início */
+.welcome__photo { position: relative; isolation: isolate; }
+.welcome__photo img {
+  position: relative;
+  z-index: 2;
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, .9))
+    drop-shadow(0 0 14px rgba(255, 255, 255, .55))
+    drop-shadow(0 28px 30px rgba(140, 29, 79, .3));
+}
+.photo-fx__orb {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 6%;
+  width: 78%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .45), transparent 45%),
+    linear-gradient(160deg, #f3a6cd 0%, #db61ac 45%, #8c1d4f 100%);
+  box-shadow: 0 30px 60px -20px rgba(140, 29, 79, .55), inset 0 -20px 40px rgba(90, 10, 50, .25);
+}
+.photo-fx__ring {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: calc(6% - 18px);
+  width: calc(78% + 36px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 1.5px dashed rgba(140, 29, 79, .45);
+  animation: ringSpin 40s linear infinite;
+}
+@keyframes ringSpin { to { transform: translateX(-50%) rotate(360deg); } }
+
+.photo-fx__spark {
+  position: absolute;
+  z-index: 3;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, .9));
+  animation: twinkle 2.8s ease-in-out infinite;
+}
+.photo-fx__spark--1 { top: 18%; left: 14%; }
+.photo-fx__spark--2 { top: 34%; right: 10%; width: 12px; height: 12px; animation-delay: -1s; }
+.photo-fx__spark--3 { bottom: 30%; left: 8%; width: 10px; height: 10px; animation-delay: -1.8s; }
+@keyframes twinkle {
+  0%, 100% { opacity: .2; transform: scale(.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+
+.photo-fx__badge {
+  position: absolute;
+  z-index: 3;
+  right: 4%;
+  bottom: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 16px 30px -16px rgba(140, 29, 79, .6);
+  color: var(--wine);
+  animation: floatY 6s ease-in-out infinite;
+}
+.photo-fx__badge b { font-family: var(--serif); font-size: 1.35rem; font-weight: 500; line-height: 1; }
+.photo-fx__badge small { font-size: .56rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+
+@media (max-width: 860px) {
+  .photo-fx__orb { width: 92%; bottom: 4%; }
+  .photo-fx__ring { width: calc(92% + 16px); bottom: calc(4% - 8px); }
+  .photo-fx__badge { right: -6px; bottom: 12%; padding: 6px 9px; border-radius: 12px; }
+  .photo-fx__badge b { font-size: .95rem; }
+  .photo-fx__badge small { font-size: .42rem; letter-spacing: .1em; }
+  .photo-fx__spark--1 { width: 12px; height: 12px; top: 12%; left: 4%; }
+  .photo-fx__spark--2 { width: 9px; height: 9px; }
+  .photo-fx__spark--3 { display: none; }
+  .welcome__photo img { filter: drop-shadow(0 0 1px rgba(255, 255, 255, .9)) drop-shadow(0 18px 20px rgba(140, 29, 79, .3)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-fx__ring, .photo-fx__spark, .photo-fx__badge { animation: none; }
+}
+.photo-fx__badge { right: 0; bottom: auto; top: 30%; }
+@media (max-width: 860px) {
+  .photo-fx__badge { display: none; }
+}
+
+/* Destaque do frete grátis na faixa do topo */
+.topbar__track .topbar__hot {
+  gap: 8px;
+  padding: 3px 14px;
+  margin: 0 28px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--wine);
+  font-weight: 500;
+  letter-spacing: .16em;
+}
+.topbar__track .topbar__hot svg { width: 16px; height: 16px; stroke-width: 1.8; }
+.topbar__track .topbar__hot::after { display: none; }
