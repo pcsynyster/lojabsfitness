@@ -1169,3 +1169,7 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
 }
 .footer__admin { color: rgba(255, 255, 255, .5); transition: color .3s; }
 .footer__admin:hover { color: var(--pink-light); }
+
+@media (max-width: 560px) {
+  .footer { padding-bottom: 96px; }
+}
