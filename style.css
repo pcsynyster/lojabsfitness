@@ -1254,3 +1254,48 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
 @media (min-width: 861px) {
   .hero__cutout { right: 50%; transform: translateX(50%); }
 }
+
+/* Cupom na sacola */
+.drawer__foot { max-height: 78dvh; overflow-y: auto; }
+.coupon-field { display: flex; flex-direction: column; gap: 5px; }
+.coupon-field__label { font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.coupon-field__row { display: flex; gap: 8px; }
+.coupon-field__row input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--cream);
+  font-size: .9rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  outline: none;
+  transition: border-color .3s;
+}
+.coupon-field__row input:focus { border-color: var(--pink); }
+.coupon-field__btn {
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid var(--pink);
+  color: var(--pink-deep);
+  font-size: .72rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: background .3s, color .3s;
+}
+.coupon-field__btn:hover { background: var(--pink); color: #fff; }
+.coupon-field__btn:disabled { opacity: .5; cursor: wait; }
+.coupon-field__msg { font-size: .8rem; min-height: 0; }
+.coupon-field__msg:empty { display: none; }
+.coupon-field__msg.is-ok { color: #2f8f5b; }
+.coupon-field__msg.is-error { color: #c4314b; }
+.coupon-field.is-applied .coupon-field__row input { border-color: #2f8f5b; background: #f1faf4; }
+.totals__discount { color: #2f8f5b; }
+.checkout input.is-invalid { border-color: #d0405f; }
+.totals__discount[hidden] { display: none; }
+.drawer { overflow-y: auto; overscroll-behavior: contain; }
+.drawer__head { position: sticky; top: 0; z-index: 2; }
+.drawer__body { flex: 0 0 auto; overflow: visible; }
+.drawer__foot { max-height: none; overflow: visible; margin-top: auto; }
+.checkout__hint { font-size: .72rem; color: var(--muted); margin-top: -2px; }

@@ -72,6 +72,13 @@ const els = {
   total: $("#cartTotal"),
   form: $("#checkout"),
   name: $("#cName"),
+  phone: $("#cPhone"),
+  coupon: $("#cCoupon"),
+  couponBtn: $("#cCouponApply"),
+  couponMsg: $("#cCouponMsg"),
+  discountRow: $("#discountRow"),
+  discountLabel: $("#discountLabel"),
+  discount: $("#cartDiscount"),
   toast: $("#toast"),
   added: $("#added")
 };
@@ -79,6 +86,7 @@ const els = {
 let cart = read(STORAGE_KEY, []);
 let favs = read(FAV_KEY, []);
 let shownTotal = 0;
+let appliedCoupon = null;
 const selection = {};
 
 const escapeHtml = (v = "") => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -384,26 +392,40 @@ function animateTotal(to) {
   const from = shownTotal;
   shownTotal = to;
   if (reduceMotion || from === to) {
-    els.subtotal.textContent = els.total.textContent = money(to);
+    els.total.textContent = money(to);
     return;
   }
   const start = performance.now();
   const step = (now) => {
     const t = Math.min(1, (now - start) / 600);
     const value = from + (to - from) * (1 - Math.pow(1 - t, 3));
-    els.subtotal.textContent = els.total.textContent = money(value);
+    els.total.textContent = money(value);
     if (t < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 }
 
+const cartSubtotal = () => cart.reduce((s, i) => s + productOf(i).price * i.qty, 0);
+const cartDiscount = (subtotal) => (appliedCoupon ? Math.round(subtotal * appliedCoupon.percent) / 100 : 0);
+
+function updateTotals() {
+  const subtotal = cartSubtotal();
+  const discount = cartDiscount(subtotal);
+  els.subtotal.textContent = money(subtotal);
+  els.discountRow.hidden = !appliedCoupon;
+  if (appliedCoupon) {
+    els.discountLabel.textContent = `Cupom ${appliedCoupon.code} (-${appliedCoupon.percent}%)`;
+    els.discount.textContent = `- ${money(discount)}`;
+  }
+  animateTotal(subtotal - discount);
+}
+
 function renderCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-  const subtotal = cart.reduce((s, i) => s + productOf(i).price * i.qty, 0);
 
   els.count.textContent = totalQty;
   els.label.textContent = `${totalQty} ${totalQty === 1 ? "peça" : "peças"}`;
-  animateTotal(subtotal);
+  updateTotals();
   els.foot.classList.toggle("is-hidden", cart.length === 0);
 
   if (!cart.length) {
@@ -469,7 +491,96 @@ function toggleFav(btn, id) {
   if (on && !reduceMotion) burstHearts(btn, 6);
 }
 
-function checkout(e) {
+const COUPON_ERRORS = {
+  usado: "Este cupom vale só para a primeira compra, e este WhatsApp já usou.",
+  invalido: "Cupom inválido ou expirado.",
+  telefone: "Informe seu WhatsApp com DDD para usar o cupom.",
+  rede: "Não foi possível validar o cupom agora. Tente de novo em instantes."
+};
+
+async function rpc(name, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+const phoneDigits = () => els.phone.value.replace(/\D/g, "");
+
+function setCouponMsg(text, ok) {
+  els.couponMsg.textContent = text;
+  els.couponMsg.classList.toggle("is-ok", ok === true);
+  els.couponMsg.classList.toggle("is-error", ok === false);
+}
+
+function removeCoupon(message = "") {
+  appliedCoupon = null;
+  els.coupon.closest(".coupon-field").classList.remove("is-applied");
+  setCouponMsg(message, message ? false : undefined);
+  updateTotals();
+}
+
+async function applyCoupon() {
+  const code = els.coupon.value.trim().toUpperCase();
+  if (!code) return removeCoupon();
+
+  if (phoneDigits().length < 10) {
+    els.phone.classList.add("is-invalid");
+    els.phone.focus();
+    return removeCoupon(COUPON_ERRORS.telefone);
+  }
+
+  els.couponBtn.disabled = true;
+  setCouponMsg("Validando cupom...");
+  try {
+    const r = await rpc("bs_check_coupon", { p_code: code, p_phone: phoneDigits() });
+    if (!r.valid) return removeCoupon(COUPON_ERRORS[r.reason] || COUPON_ERRORS.invalido);
+    appliedCoupon = { code: r.code, percent: r.percent };
+    els.coupon.value = r.code;
+    els.coupon.closest(".coupon-field").classList.add("is-applied");
+    setCouponMsg(`Cupom aplicado: ${r.percent}% de desconto na sua primeira compra.`, true);
+    updateTotals();
+  } catch {
+    removeCoupon(COUPON_ERRORS.rede);
+  } finally {
+    els.couponBtn.disabled = false;
+  }
+}
+
+function buildMessage(name, phone) {
+  const lines = cart.map((i) => {
+    const p = productOf(i);
+    return `- ${i.qty}x ${p.name} (${i.color}, Tam. ${i.size}) - ${money(p.price * i.qty)}`;
+  });
+  const subtotal = cartSubtotal();
+  const discount = cartDiscount(subtotal);
+
+  return [
+    `Olá, BS Fitness! Meu nome é ${name} e quero fazer um pedido pelo site:`,
+    phone ? `WhatsApp informado: ${phone}` : null,
+    "",
+    ...lines,
+    "",
+    `Subtotal: ${money(subtotal)}`,
+    appliedCoupon ? `Cupom ${appliedCoupon.code} (-${appliedCoupon.percent}%): - ${money(discount)}` : null,
+    `Total dos produtos: ${money(subtotal - discount)}`,
+    `Entrega: ${$("#cDelivery").value}`,
+    `Pagamento: ${$("#cPay").value}`,
+    "",
+    "Aguardo a confirmação e o valor do frete."
+  ].filter((l) => l !== null).join("\n");
+}
+
+function openWhatsApp(message, win) {
+  const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`;
+  if (win && !win.closed) win.location.href = url;
+  else window.location.href = url;
+}
+
+async function checkout(e) {
   e.preventDefault();
   const name = els.name.value.trim();
 
@@ -480,25 +591,32 @@ function checkout(e) {
     return;
   }
 
-  const lines = cart.map((i) => {
-    const p = productOf(i);
-    return `- ${i.qty}x ${p.name} (${i.color}, Tam. ${i.size}) - ${money(p.price * i.qty)}`;
-  });
-  const total = cart.reduce((s, i) => s + productOf(i).price * i.qty, 0);
+  if (els.coupon.value.trim() && !appliedCoupon) {
+    showToast("Toque em Aplicar para validar o cupom");
+    els.couponBtn.focus();
+    return;
+  }
 
-  const message = [
-    `Olá, BS Fitness! Meu nome é ${name} e quero fazer um pedido pelo site:`,
-    "",
-    ...lines,
-    "",
-    `Total dos produtos: ${money(total)}`,
-    `Entrega: ${$("#cDelivery").value}`,
-    `Pagamento: ${$("#cPay").value}`,
-    "",
-    "Aguardo a confirmação e o valor do frete."
-  ].join("\n");
+  if (!appliedCoupon) return openWhatsApp(buildMessage(name, els.phone.value.trim()), window.open("", "_blank"));
 
-  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`, "_blank", "noopener");
+  const win = window.open("", "_blank");
+  const submit = $("button[type=submit]", els.form);
+  submit.disabled = true;
+  try {
+    const r = await rpc("bs_use_coupon", { p_code: appliedCoupon.code, p_phone: phoneDigits() });
+    if (!r.valid) {
+      win?.close();
+      removeCoupon(COUPON_ERRORS[r.reason] || COUPON_ERRORS.invalido);
+      showToast("O cupom não pôde ser usado. Confira o total antes de enviar.");
+      return;
+    }
+    openWhatsApp(buildMessage(name, els.phone.value.trim()), win);
+  } catch {
+    win?.close();
+    showToast(COUPON_ERRORS.rede);
+  } finally {
+    submit.disabled = false;
+  }
 }
 
 function openCart() {
@@ -609,6 +727,18 @@ $("#cartClose").addEventListener("click", closeCart);
 els.overlay.addEventListener("click", closeCart);
 els.form.addEventListener("submit", checkout);
 els.name.addEventListener("input", () => els.name.classList.remove("is-invalid"));
+els.couponBtn.addEventListener("click", applyCoupon);
+els.coupon.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    applyCoupon();
+  }
+});
+els.coupon.addEventListener("input", () => appliedCoupon && removeCoupon());
+els.phone.addEventListener("input", () => {
+  els.phone.classList.remove("is-invalid");
+  if (appliedCoupon) removeCoupon("Número alterado. Toque em Aplicar de novo para validar o cupom.");
+});
 
 $("#cartClear").addEventListener("click", () => {
   cart = [];

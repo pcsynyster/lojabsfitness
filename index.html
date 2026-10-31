@@ -84,7 +84,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -374,6 +374,19 @@
           <span>Seu nome</span>
           <input type="text" id="cName" placeholder="Como podemos te chamar?" required>
         </label>
+        <label>
+          <span>Seu WhatsApp</span>
+          <input type="tel" id="cPhone" inputmode="tel" autocomplete="tel" placeholder="(84) 90000-0000" maxlength="20">
+        </label>
+        <p class="checkout__hint">Usamos seu número só para validar o cupom e falar sobre o seu pedido.</p>
+        <div class="coupon-field">
+          <span class="coupon-field__label">Cupom de desconto</span>
+          <div class="coupon-field__row">
+            <input type="text" id="cCoupon" placeholder="Ex.: BS10" autocapitalize="characters" maxlength="20" aria-label="Cupom de desconto">
+            <button type="button" class="coupon-field__btn" id="cCouponApply">Aplicar</button>
+          </div>
+          <p class="coupon-field__msg" id="cCouponMsg" aria-live="polite"></p>
+        </div>
         <div class="checkout__row">
           <label>
             <span>Entrega</span>
@@ -394,6 +407,7 @@
         </div>
         <div class="totals">
           <div><span>Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
+          <div class="totals__discount" id="discountRow" hidden><span id="discountLabel">Cupom</span><span id="cartDiscount">- R$ 0,00</span></div>
           <div class="totals__muted"><span>Frete</span><span>a combinar</span></div>
           <div class="totals__total"><span>Total</span><span id="cartTotal">R$ 0,00</span></div>
         </div>
@@ -425,6 +439,6 @@
     </span>
   </a>
 
-  <script src="script.js?v=8"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
