@@ -412,8 +412,8 @@ function updateTotals() {
   const subtotal = cartSubtotal();
   const discount = cartDiscount(subtotal);
   els.subtotal.textContent = money(subtotal);
-  els.discountRow.hidden = !appliedCoupon;
-  if (appliedCoupon) {
+  if (els.discountRow) els.discountRow.hidden = !appliedCoupon;
+  if (appliedCoupon && els.discountLabel && els.discount) {
     els.discountLabel.textContent = `Cupom ${appliedCoupon.code} (-${appliedCoupon.percent}%)`;
     els.discount.textContent = `- ${money(discount)}`;
   }
@@ -508,9 +508,10 @@ async function rpc(name, body) {
   return res.json();
 }
 
-const phoneDigits = () => els.phone.value.replace(/\D/g, "");
+const phoneDigits = () => (els.phone?.value || "").replace(/\D/g, "");
 
 function setCouponMsg(text, ok) {
+  if (!els.couponMsg) return;
   els.couponMsg.textContent = text;
   els.couponMsg.classList.toggle("is-ok", ok === true);
   els.couponMsg.classList.toggle("is-error", ok === false);
@@ -518,7 +519,7 @@ function setCouponMsg(text, ok) {
 
 function removeCoupon(message = "") {
   appliedCoupon = null;
-  els.coupon.closest(".coupon-field").classList.remove("is-applied");
+  els.coupon?.closest(".coupon-field")?.classList.remove("is-applied");
   setCouponMsg(message, message ? false : undefined);
   updateTotals();
 }
@@ -591,13 +592,14 @@ async function checkout(e) {
     return;
   }
 
-  if (els.coupon.value.trim() && !appliedCoupon) {
+  if (els.coupon?.value.trim() && !appliedCoupon) {
     showToast("Toque em Aplicar para validar o cupom");
     els.couponBtn.focus();
     return;
   }
 
-  if (!appliedCoupon) return openWhatsApp(buildMessage(name, els.phone.value.trim()), window.open("", "_blank"));
+  const phone = els.phone?.value.trim() || "";
+  if (!appliedCoupon) return openWhatsApp(buildMessage(name, phone), window.open("", "_blank"));
 
   const win = window.open("", "_blank");
   const submit = $("button[type=submit]", els.form);
@@ -610,7 +612,7 @@ async function checkout(e) {
       showToast("O cupom não pôde ser usado. Confira o total antes de enviar.");
       return;
     }
-    openWhatsApp(buildMessage(name, els.phone.value.trim()), win);
+    openWhatsApp(buildMessage(name, phone), win);
   } catch {
     win?.close();
     showToast(COUPON_ERRORS.rede);
@@ -727,15 +729,15 @@ $("#cartClose").addEventListener("click", closeCart);
 els.overlay.addEventListener("click", closeCart);
 els.form.addEventListener("submit", checkout);
 els.name.addEventListener("input", () => els.name.classList.remove("is-invalid"));
-els.couponBtn.addEventListener("click", applyCoupon);
-els.coupon.addEventListener("keydown", (e) => {
+els.couponBtn?.addEventListener("click", applyCoupon);
+els.coupon?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     applyCoupon();
   }
 });
-els.coupon.addEventListener("input", () => appliedCoupon && removeCoupon());
-els.phone.addEventListener("input", () => {
+els.coupon?.addEventListener("input", () => appliedCoupon && removeCoupon());
+els.phone?.addEventListener("input", () => {
   els.phone.classList.remove("is-invalid");
   if (appliedCoupon) removeCoupon("Número alterado. Toque em Aplicar de novo para validar o cupom.");
 });
