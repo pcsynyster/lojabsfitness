@@ -84,7 +84,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -135,11 +135,21 @@
       <div class="container hero__inner">
         <div class="hero__text reveal">
           <p class="eyebrow">Moda fitness &middot; Parnamirim/RN</p>
-          <h1 class="hero__title">Look novo é <em>pré-treino.</em></h1>
-          <p class="hero__lead">Seja muito bem-vinda. Estamos aqui para te dar ainda mais conforto e aumentar sua autoestima, do treino ao dia a dia.</p>
+          <h1 class="hero__title">Seja <em>bem-vinda!</em></h1>
+          <p class="hero__lead">A disciplina constrói resultados, o look certo aumenta sua confiança.</p>
           <div class="hero__cta">
             <a href="#colecao" class="btn btn--solid">Ver coleção</a>
             <a href="https://wa.me/5584996327979?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20BS%20Fitness!" target="_blank" rel="noopener" class="btn btn--line">Atendimento personalizado</a>
+          </div>
+          <div class="coupon">
+            <div class="coupon__text">
+              <strong>Nova por aqui?</strong>
+              <p>Use o cupom <b>BS10</b> e garanta 10% de desconto em sua primeira compra.</p>
+            </div>
+            <button type="button" class="coupon__code" id="couponCopy" data-code="BS10" aria-label="Copiar cupom BS10">
+              <span>BS10</span>
+              <small>Copiar</small>
+            </button>
           </div>
           <ul class="hero__facts">
             <li><strong>P ao GG</strong><span>grade completa</span></li>
@@ -156,14 +166,9 @@
             <img src="assets/img/hero-modelo.jpg" alt="Modelo vestindo conjunto fitness rosa da BS Fitness">
           </figure>
 
-          <div class="story story--hero">
-            <div class="story__bar"><span></span></div>
-            <div class="story__head">
-              <img src="assets/img/logo.png" alt="">
-              <p><strong>lojabsfitness</strong><small>Parnamirim, RN</small></p>
-            </div>
-            <video src="assets/video/reel-1.mp4" poster="assets/video/reel-1.jpg" muted loop playsinline autoplay preload="metadata"></video>
-          </div>
+          <figure class="hero__cutout">
+            <img src="assets/img/hero-recorte.webp" alt="Cliente vestindo conjunto fitness com bolso da BS Fitness" width="559" height="1100" fetchpriority="high">
+          </figure>
 
           <a href="#colecao" class="hero__chip" data-goto="aurora">
             <img src="assets/img/aurora-branco-lilas.jpg" alt="">
@@ -424,6 +429,6 @@
     </span>
   </a>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

@@ -1173,3 +1173,80 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
 @media (max-width: 560px) {
   .footer { padding-bottom: 96px; }
 }
+
+/* Foto recortada no início */
+.hero__cutout {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  z-index: 1;
+  pointer-events: none;
+}
+.hero__cutout img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(120, 20, 80, .28));
+}
+
+/* Cupom de boas-vindas */
+.coupon {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 480px;
+  margin: -22px 0 40px;
+  padding: 16px 16px 16px 22px;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px dashed var(--pink-light);
+  box-shadow: 0 20px 40px -32px rgba(179, 48, 124, .6);
+}
+.coupon__text { flex: 1; min-width: 0; }
+.coupon__text strong {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: var(--pink-deep);
+}
+.coupon__text p { font-size: .9rem; color: var(--muted); margin-top: 4px; }
+.coupon__text b { color: var(--ink); font-weight: 500; letter-spacing: .06em; }
+.coupon__code {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 18px;
+  border-radius: 16px;
+  background: var(--pink);
+  color: #fff;
+  transition: background .3s, transform .3s var(--ease);
+}
+.coupon__code:hover { background: var(--pink-deep); }
+.coupon__code span { font-size: 1.15rem; font-weight: 500; letter-spacing: .14em; }
+.coupon__code small { font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; opacity: .9; }
+.coupon__code.is-copied { background: var(--ink); }
+
+@media (max-width: 860px) {
+  .hero__cutout {
+    position: relative;
+    right: auto;
+    height: auto;
+    justify-content: center;
+  }
+  .hero__cutout img { height: min(460px, 110vw); }
+  .hero__media .hero__chip { margin-top: -50px; z-index: 2; }
+}
+
+@media (max-width: 560px) {
+  .coupon { margin: -18px 0 34px; padding: 14px; gap: 12px; }
+  .coupon__text strong { font-size: 1.2rem; }
+  .coupon__text p { font-size: .84rem; }
+  .coupon__code { padding: 9px 12px; }
+}

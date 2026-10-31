@@ -626,6 +626,30 @@ window.addEventListener("scroll", () => {
   else if (y < 40) els.header.classList.remove("is-compact");
 }, { passive: true });
 
+const couponBtn = $("#couponCopy");
+if (couponBtn) {
+  couponBtn.addEventListener("click", async () => {
+    const code = couponBtn.dataset.code;
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const tmp = document.createElement("textarea");
+      tmp.value = code;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand("copy");
+      tmp.remove();
+    }
+    couponBtn.classList.add("is-copied");
+    $("small", couponBtn).textContent = "Copiado";
+    showToast(`Cupom ${code} copiado`);
+    setTimeout(() => {
+      couponBtn.classList.remove("is-copied");
+      $("small", couponBtn).textContent = "Copiar";
+    }, 2000);
+  });
+}
+
 const track = $(".topbar__track");
 track.innerHTML = track.innerHTML.repeat(4);
 
