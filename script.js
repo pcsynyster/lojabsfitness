@@ -87,6 +87,7 @@ let cart = read(STORAGE_KEY, []);
 let favs = read(FAV_KEY, []);
 let shownTotal = 0;
 let appliedCoupon = null;
+let productsReady = false;
 const selection = {};
 
 const escapeHtml = (v = "") => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -111,19 +112,25 @@ function normalize(list) {
     .filter((p) => p.variants.length);
 }
 
-function setProducts(list) {
+function setProducts(list, keepCart = false) {
   products = normalize(list);
   products.forEach((p) => {
     const v = p.variants[0];
     selection[p.id] = { variant: 0, size: v.sizes.length === 1 ? v.sizes[0] : null };
   });
-  cart = cart.filter((i) => products.some((p) => p.id === i.id));
-  saveCart();
+  if (!keepCart) {
+    cart = cart.filter((i) => products.some((p) => p.id === i.id));
+    saveCart();
+  }
+  productsReady = true;
 }
 
 async function fetchProducts() {
   const url = `${SUPABASE_URL}/rest/v1/bs_products?select=id,name,price,tag,description,variants&active=eq.true&order=position.asc,created_at.asc`;
-  const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, signal: ctrl.signal })
+    .finally(() => clearTimeout(timer));
   if (!res.ok) throw new Error(res.status);
   return res.json();
 }
@@ -405,7 +412,8 @@ function animateTotal(to) {
   requestAnimationFrame(step);
 }
 
-const cartSubtotal = () => cart.reduce((s, i) => s + productOf(i).price * i.qty, 0);
+const cartLines = () => cart.filter((i) => productOf(i));
+const cartSubtotal = () => cartLines().reduce((s, i) => s + productOf(i).price * i.qty, 0);
 const cartDiscount = (subtotal) => (appliedCoupon ? Math.round(subtotal * appliedCoupon.percent) / 100 : 0);
 
 function updateTotals() {
@@ -421,14 +429,19 @@ function updateTotals() {
 }
 
 function renderCart() {
-  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  if (!productsReady) {
+    els.count.textContent = cart.reduce((s, i) => s + i.qty, 0);
+    return;
+  }
+  const lines = cartLines();
+  const totalQty = lines.reduce((s, i) => s + i.qty, 0);
 
   els.count.textContent = totalQty;
   els.label.textContent = `${totalQty} ${totalQty === 1 ? "peça" : "peças"}`;
   updateTotals();
-  els.foot.classList.toggle("is-hidden", cart.length === 0);
+  els.foot.classList.toggle("is-hidden", lines.length === 0);
 
-  if (!cart.length) {
+  if (!lines.length) {
     els.items.innerHTML = `
       <div class="empty">
         ${ICONS.heart}
@@ -439,7 +452,7 @@ function renderCart() {
     return;
   }
 
-  els.items.innerHTML = cart.map((i) => {
+  els.items.innerHTML = lines.map((i) => {
     const p = productOf(i);
     return `
       <div class="item" data-key="${i.key}">
@@ -552,7 +565,7 @@ async function applyCoupon() {
 }
 
 function buildMessage(name, phone) {
-  const lines = cart.map((i) => {
+  const lines = cartLines().map((i) => {
     const p = productOf(i);
     return `- ${i.qty}x ${p.name} (${i.color}, Tam. ${i.size}) - ${money(p.price * i.qty)}`;
   });
@@ -814,10 +827,14 @@ renderCart();
 
 fetchProducts()
   .then((list) => setProducts(list))
-  .catch(() => setProducts(FALLBACK))
+  .catch(() => setProducts(FALLBACK, true))
   .finally(() => {
-    renderProducts();
-    renderCart();
-    updateHeroChip();
-    injectProductSchema();
+    productsReady = true;
+    [renderProducts, renderCart, updateHeroChip, injectProductSchema].forEach((fn) => {
+      try {
+        fn();
+      } catch (err) {
+        console.error(err);
+      }
+    });
   });
