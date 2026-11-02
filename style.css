@@ -1653,3 +1653,26 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
 }
 .topbar__track .topbar__hot svg { width: 16px; height: 16px; stroke-width: 1.8; }
 .topbar__track .topbar__hot::after { display: none; }
+
+/* Foto à direita, sem círculo e sem coração no título */
+.welcome__inner { grid-template-columns: 1.1fr .9fr; }
+.welcome__photo { order: 2; }
+.welcome__text { order: 1; }
+.welcome__title { padding-right: 0; }
+
+@media (max-width: 860px) {
+  .welcome__inner {
+    grid-template-columns: 1fr 44%;
+    grid-template-areas:
+      "title photo"
+      "swash photo"
+      "lead photo"
+      "divider photo"
+      "pill pill"
+      "ticket ticket"
+      "cta cta";
+  }
+}
+@media (max-width: 360px) {
+  .welcome__inner { grid-template-columns: 1fr 42%; }
+}
