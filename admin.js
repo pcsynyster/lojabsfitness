@@ -127,6 +127,7 @@ function renderList() {
             <span class="item__dots">${v.map((x) => `<i style="background:${swatchCss(x)}" title="${escapeHtml(x.color)}"></i>`).join("")}</span>
             <span>${sizes.length ? sizes.join(", ") : "sem tamanhos"}</span>
             ${p.active ? (p.tag ? `<span class="badge">${escapeHtml(p.tag)}</span>` : "") : '<span class="badge badge--off">Oculto</span>'}
+            ${p.sold_out ? '<span class="badge badge--soldout">Esgotado</span>' : v.some((x) => x.soldOut) ? '<span class="badge badge--soldout">Cor esgotada</span>' : ""}
           </div>
         </div>
         <div class="item__actions">
@@ -134,6 +135,7 @@ function renderList() {
             <input type="checkbox" data-act="toggle" ${p.active ? "checked" : ""}>
             <span class="switch__track"></span>
           </label>
+          <button class="soldout-btn ${p.sold_out ? "is-on" : ""}" data-act="soldout" aria-pressed="${Boolean(p.sold_out)}">${p.sold_out ? "Esgotado" : "Esgotar"}</button>
           <button class="icon-btn" data-act="up" aria-label="Subir" ${i === 0 ? "disabled" : ""}>${ICONS.up}</button>
           <button class="icon-btn" data-act="down" aria-label="Descer" ${i === products.length - 1 ? "disabled" : ""}>${ICONS.down}</button>
           <button class="icon-btn" data-act="edit" aria-label="Editar">${ICONS.edit}</button>
@@ -151,9 +153,21 @@ $("#list").addEventListener("click", async (e) => {
   const act = btn.dataset.act;
 
   if (act === "edit") openEditor(p);
+  if (act === "soldout") toggleSoldOut(p, btn);
   if (act === "delete") confirmDelete(p);
   if (act === "up" || act === "down") move(p, act === "up" ? -1 : 1);
 });
+
+async function toggleSoldOut(p, btn) {
+  const sold_out = !p.sold_out;
+  btn.disabled = true;
+  const { error } = await db.from("bs_products").update({ sold_out }).eq("id", p.id);
+  btn.disabled = false;
+  if (error) return showToast("Não foi possível alterar. Tente de novo.", true);
+  p.sold_out = sold_out;
+  renderList();
+  showToast(sold_out ? "Produto marcado como esgotado" : "Produto disponível de novo");
+}
 
 $("#list").addEventListener("change", async (e) => {
   if (e.target.dataset.act !== "toggle") return;
@@ -230,6 +244,7 @@ function openEditor(p = null) {
   $("#fTag").value = p?.tag || "";
   $("#fDesc").value = p?.description || "";
   $("#fActive").checked = p ? p.active : true;
+  $("#fSoldOut").checked = Boolean(p?.sold_out);
   $("#formError").textContent = "";
   $$(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
 
@@ -267,6 +282,7 @@ function addVariant(v = {}) {
   $(".v-color", node).value = v.color || "";
   $(".v-hex", node).value = v.hex || "#db61ac";
   $(".v-two", node).checked = Boolean(v.hex2);
+  $(".v-soldout", node).checked = Boolean(v.soldOut);
   $(".v-hex2", node).value = v.hex2 || "#ffffff";
   $(".v-hex2-wrap", node).hidden = !v.hex2;
   $$(".size-check input", node).forEach((c) => (c.checked = (v.sizes || []).includes(c.value)));
@@ -397,7 +413,8 @@ $("#productForm").addEventListener("submit", async (e) => {
       hex: $(".v-hex", n).value,
       ...(two ? { hex2: $(".v-hex2", n).value } : {}),
       img: n.dataset.img,
-      sizes: SIZES.filter((s) => sizes.includes(s))
+      sizes: SIZES.filter((s) => sizes.includes(s)),
+      ...($(".v-soldout", n).checked ? { soldOut: true } : {})
     });
   }
 
@@ -407,6 +424,7 @@ $("#productForm").addEventListener("submit", async (e) => {
     tag: $("#fTag").value.trim() || null,
     description: $("#fDesc").value.trim() || null,
     active: $("#fActive").checked,
+    sold_out: $("#fSoldOut").checked,
     variants
   };
 

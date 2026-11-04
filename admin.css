@@ -370,3 +370,25 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   .variant__remove { background: rgba(255, 255, 255, .92); z-index: 2; top: 20px; right: 20px; }
   .editor__foot .btn { flex: 1; }
 }
+
+/* Esgotado */
+.badge--soldout { background: #8c1d4f; color: #fff; }
+.soldout-btn {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: .64rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: background .3s, color .3s, border-color .3s;
+  white-space: nowrap;
+}
+.soldout-btn:hover { border-color: #8c1d4f; color: #8c1d4f; }
+.soldout-btn.is-on { background: #8c1d4f; border-color: #8c1d4f; color: #fff; }
+.soldout-btn:disabled { opacity: .5; cursor: wait; }
+.switch--soldout small { color: var(--muted); font-size: .78rem; }
+.switch--soldout input:checked + .switch__track { background: #8c1d4f; }
+.check--soldout span { color: #8c1d4f; }
+
+.soldout-btn { padding: 7px 10px; }

@@ -116,13 +116,15 @@ function normalize(list) {
       price: Number(p.price),
       tag: p.tag ? escapeHtml(p.tag) : "",
       desc: escapeHtml(p.description || ""),
+      soldOut: Boolean(p.sold_out),
       variants: (p.variants || [])
         .filter((v) => v.img && v.sizes?.length)
         .map((v) => ({
           color: escapeHtml(v.color),
           swatch: v.hex2 ? `linear-gradient(135deg, ${v.hex} 50%, ${v.hex2} 50%)` : v.hex,
           img: v.img,
-          sizes: v.sizes
+          sizes: v.sizes,
+          soldOut: Boolean(p.sold_out || v.soldOut)
         }))
     }))
     .filter((p) => p.variants.length);
@@ -131,8 +133,9 @@ function normalize(list) {
 function setProducts(list, keepCart = false) {
   products = normalize(list);
   products.forEach((p) => {
-    const v = p.variants[0];
-    selection[p.id] = { variant: 0, size: v.sizes.length === 1 ? v.sizes[0] : null };
+    const index = Math.max(0, p.variants.findIndex((x) => !x.soldOut));
+    const v = p.variants[index];
+    selection[p.id] = { variant: index, size: !v.soldOut && v.sizes.length === 1 ? v.sizes[0] : null };
   });
   if (!keepCart) {
     cart = cart.filter((i) => products.some((p) => p.id === i.id));
@@ -142,7 +145,7 @@ function setProducts(list, keepCart = false) {
 }
 
 async function fetchProducts() {
-  const url = `${SUPABASE_URL}/rest/v1/bs_products?select=id,name,price,tag,description,variants&active=eq.true&order=position.asc,created_at.asc`;
+  const url = `${SUPABASE_URL}/rest/v1/bs_products?select=id,name,price,tag,description,variants,sold_out&active=eq.true&order=position.asc,created_at.asc`;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 8000);
   const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, signal: ctrl.signal })
@@ -176,7 +179,7 @@ function injectProductSchema() {
           "@type": "Offer",
           price: p.price.toFixed(2),
           priceCurrency: "BRL",
-          availability: "https://schema.org/InStock",
+          availability: p.variants.every((v) => v.soldOut) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
           url: `${SITE_URL}#colecao`,
           seller: { "@id": `${SITE_URL}#loja` }
         }
@@ -234,18 +237,18 @@ function cardInner(p) {
   const fav = favs.includes(p.id);
 
   const swatches = p.variants.map((x, i) => `
-    <button class="color ${i === sel.variant ? "is-active" : ""}" style="background:${x.swatch}"
-      data-variant="${i}" title="${x.color}" aria-label="Cor ${x.color}"></button>`).join("");
+    <button class="color ${i === sel.variant ? "is-active" : ""} ${x.soldOut ? "is-soldout" : ""}" style="background:${x.swatch}"
+      data-variant="${i}" title="${x.color}${x.soldOut ? " (esgotado)" : ""}" aria-label="Cor ${x.color}${x.soldOut ? ", esgotada" : ""}"></button>`).join("");
 
   const sizes = SIZES.map((s) => {
-    const ok = v.sizes.includes(s);
+    const ok = !v.soldOut && v.sizes.includes(s);
     return `<button class="size ${sel.size === s ? "is-active" : ""} ${ok ? "" : "is-off"}" data-size="${s}" ${ok ? "" : "disabled"} aria-label="Tamanho ${s}${ok ? "" : " indisponível"}">${s}</button>`;
   }).join("");
 
   return `
-    <div class="card__media">
+    <div class="card__media ${v.soldOut ? "is-soldout" : ""}">
       <img src="${v.img}" alt="${p.name} ${v.color}" loading="lazy">
-      ${p.tag ? `<span class="card__tag">${p.tag}</span>` : ""}
+      ${v.soldOut ? '<span class="card__tag card__tag--soldout">Esgotado</span>' : p.tag ? `<span class="card__tag">${p.tag}</span>` : ""}
       <button class="fav ${fav ? "is-on" : ""}" aria-label="Favoritar ${p.name}" aria-pressed="${fav}">${ICONS.heart}</button>
     </div>
     <div class="card__body">
@@ -263,9 +266,11 @@ function cardInner(p) {
       </div>
       <div class="card__opts">
         <div class="sizes">${sizes}</div>
-        <span class="card__stock">Disponível: ${v.sizes.join(", ")}</span>
+        <span class="card__stock">${v.soldOut ? "Esgotado" : `Disponível: ${v.sizes.join(", ")}`}</span>
       </div>
-      <button class="card__add">${ICONS.bag}<span>Adicionar à sacola</span></button>
+      ${v.soldOut
+        ? '<button class="card__add is-soldout" disabled>Esgotado</button>'
+        : `<button class="card__add">${ICONS.bag}<span>Adicionar à sacola</span></button>`}
     </div>`;
 }
 
@@ -278,7 +283,7 @@ function renderProducts() {
 function selectVariant(card, index) {
   const p = products.find((x) => x.id === card.dataset.id);
   const v = p.variants[index];
-  selection[p.id] = { variant: index, size: v.sizes.length === 1 ? v.sizes[0] : null };
+  selection[p.id] = { variant: index, size: !v.soldOut && v.sizes.length === 1 ? v.sizes[0] : null };
 
   $(".card__media img", card).classList.add("is-swapping");
   setTimeout(() => {
@@ -293,6 +298,8 @@ function addToCart(card, btn) {
   const p = products.find((x) => x.id === card.dataset.id);
   const sel = selection[p.id];
   const v = variantOf(p);
+
+  if (v.soldOut) return showToast("Essa cor está esgotada");
 
   if (!sel.size) {
     showToast("Escolha um tamanho");
@@ -428,7 +435,10 @@ function animateTotal(to) {
   requestAnimationFrame(step);
 }
 
-const cartLines = () => cart.filter((i) => productOf(i));
+const cartLines = () => cart.filter((i) => {
+  const p = productOf(i);
+  return p && !p.variants.find((v) => v.color === i.color)?.soldOut;
+});
 const cartSubtotal = () => cartLines().reduce((s, i) => s + productOf(i).price * i.qty, 0);
 const cartDiscount = (subtotal) => (appliedCoupon ? Math.round(subtotal * appliedCoupon.percent) / 100 : 0);
 

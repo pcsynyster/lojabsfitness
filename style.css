@@ -1676,3 +1676,25 @@ body.lock .wa-float { opacity: 0; transform: scale(.8); pointer-events: none; }
 @media (max-width: 360px) {
   .welcome__inner { grid-template-columns: 1fr 42%; }
 }
+
+/* Esgotado */
+.card__media.is-soldout img { filter: grayscale(.85) brightness(1.05); opacity: .75; }
+.card__tag--soldout { background: var(--wine, #8c1d4f); color: #fff; }
+.color.is-soldout { position: relative; opacity: .55; }
+.color.is-soldout::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: -2px; bottom: -2px;
+  width: 2px;
+  background: #5a2443;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 2px;
+}
+.card__add.is-soldout,
+.card__add.is-soldout:hover {
+  background: #eee4ea;
+  border-color: #eee4ea;
+  color: #8b6880;
+  cursor: not-allowed;
+  letter-spacing: .2em;
+}

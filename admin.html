@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=1">
+  <link rel="stylesheet" href="admin.css?v=2">
 </head>
 <body>
 
@@ -119,6 +119,12 @@
           <span>Mostrar no site</span>
         </label>
 
+        <label class="switch switch--soldout">
+          <input type="checkbox" id="fSoldOut">
+          <span class="switch__track"></span>
+          <span>Produto esgotado <small>(continua no site, mas sem poder comprar)</small></span>
+        </label>
+
         <div class="variants">
           <div class="variants__head">
             <h3>Cores, fotos e tamanhos</h3>
@@ -195,6 +201,10 @@
             <input type="checkbox" class="v-two">
             <span>Duas cores</span>
           </label>
+          <label class="check check--soldout">
+            <input type="checkbox" class="v-soldout">
+            <span>Cor esgotada</span>
+          </label>
           <label class="swatch-pick v-hex2-wrap" hidden>
             <input type="color" class="v-hex2" value="#ffffff">
             <span>2ª cor</span>
@@ -220,6 +230,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-  <script src="admin.js?v=1"></script>
+  <script src="admin.js?v=2"></script>
 </body>
 </html>
